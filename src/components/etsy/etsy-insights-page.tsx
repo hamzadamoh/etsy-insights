@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useActionState, useCallback } from 'react';
+import React, { useState, useActionState, useCallback, useTransition } from 'react';
 import { getEtsyInsights } from '@/app/actions';
 import { EtsyForm } from './etsy-form';
 import { ShopDetails } from './shop-details';
@@ -18,13 +18,12 @@ const initialState = {
 };
 
 export default function EtsyInsightsPage() {
+  const [isPending, startTransition] = useTransition();
   const [state, formAction] = useActionState(getEtsyInsights, initialState);
   const [filters, setFilters] = useState<FilterState>({ favorites: 5, age: 30, views: 5 });
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
 
   React.useEffect(() => {
-    setIsSubmitting(false);
     if (state.error) {
       toast({
         variant: 'destructive',
@@ -35,8 +34,9 @@ export default function EtsyInsightsPage() {
   }, [state, toast]);
 
   const handleFormSubmit = (formData: FormData) => {
-    setIsSubmitting(true);
-    formAction(formData);
+    startTransition(() => {
+        formAction(formData);
+    });
   };
 
   const onFilterChange = useCallback((newFilters: FilterState) => {
@@ -49,12 +49,12 @@ export default function EtsyInsightsPage() {
     <div className="space-y-8">
       <EtsyForm
         formAction={handleFormSubmit}
-        isSubmitting={isSubmitting}
+        isSubmitting={isPending}
         onFilterChange={onFilterChange}
         initialFilters={filters}
       />
 
-      {isSubmitting && !etsyData && (
+      {isPending && !etsyData && (
         <div className="space-y-8">
           <Skeleton className="h-32 w-full rounded-lg" />
           <Skeleton className="h-24 w-full rounded-lg" />
@@ -67,7 +67,7 @@ export default function EtsyInsightsPage() {
         </div>
       )}
       
-      {state.error && !isSubmitting && !etsyData && (
+      {state.error && !isPending && !etsyData && (
         <Alert variant="destructive" className="mt-8">
             <AlertCircle className="h-4 w-4" />
             <AlertTitle>Error</AlertTitle>
@@ -75,7 +75,7 @@ export default function EtsyInsightsPage() {
         </Alert>
       )}
 
-      {etsyData && !isSubmitting && (
+      {etsyData && !isPending && (
         <div className="space-y-8">
           <TrendSummary summary={etsyData.trendAnalysis.summary} />
           <ShopDetails shop={etsyData.shop} filters={filters} />
