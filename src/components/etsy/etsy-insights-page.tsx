@@ -1,7 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
-import { useFormState } from 'react-dom';
+import React, { useState, useActionState } from 'react';
 import { getEtsyInsights } from '@/app/actions';
 import { EtsyForm } from './etsy-form';
 import { ShopDetails } from './shop-details';
@@ -19,7 +18,7 @@ const initialState = {
 };
 
 export default function EtsyInsightsPage() {
-  const [state, formAction] = useFormState(getEtsyInsights, initialState);
+  const [state, formAction] = useActionState(getEtsyInsights, initialState);
   const [filters, setFilters] = useState<FilterState>({ favorites: 5, age: 30, views: 5 });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
