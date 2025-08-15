@@ -38,12 +38,13 @@ export function EtsyForm({ formAction, isSubmitting, onFilterChange, initialFilt
     },
   });
 
-  const watchedFilters = watch(['favorites', 'age', 'views']);
+  const favorites = watch('favorites');
+  const age = watch('age');
+  const views = watch('views');
 
   React.useEffect(() => {
-    const [favorites, age, views] = watchedFilters;
     onFilterChange({ favorites, age, views });
-  }, [watchedFilters, onFilterChange]);
+  }, [favorites, age, views, onFilterChange]);
 
   const handlePrint = () => {
     window.print();

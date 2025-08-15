@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useActionState } from 'react';
+import React, { useState, useActionState, useCallback } from 'react';
 import { getEtsyInsights } from '@/app/actions';
 import { EtsyForm } from './etsy-form';
 import { ShopDetails } from './shop-details';
@@ -38,6 +38,10 @@ export default function EtsyInsightsPage() {
     setIsSubmitting(true);
     formAction(formData);
   };
+
+  const onFilterChange = useCallback((newFilters: FilterState) => {
+    setFilters(newFilters);
+  }, []);
   
   const etsyData = state.data as EtsyData | null;
 
@@ -46,7 +50,7 @@ export default function EtsyInsightsPage() {
       <EtsyForm
         formAction={handleFormSubmit}
         isSubmitting={isSubmitting}
-        onFilterChange={setFilters}
+        onFilterChange={onFilterChange}
         initialFilters={filters}
       />
 
