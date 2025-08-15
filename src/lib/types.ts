@@ -19,9 +19,9 @@ export interface EtsyListing {
   original_creation_timestamp: number;
   last_modified_timestamp: number;
   quantity: number;
-  tags: string[];
+  tags: string[] | null;
   url: string;
-  images: { url_75x75: string }[];
+  images: { url_75x75: string }[] | null;
 }
 
 export interface EtsyApiResponse<T> {

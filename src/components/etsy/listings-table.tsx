@@ -66,7 +66,7 @@ export function ListingsTable({ listings, filters }: ListingsTableProps) {
                     <TableCell className="font-medium">
                         <div className="flex items-center gap-3">
                             <Image 
-                                src={listing.images[0]?.url_75x75 ?? 'https://placehold.co/75x75.png'} 
+                                src={listing.images?.[0]?.url_75x75 ?? 'https://placehold.co/75x75.png'} 
                                 alt={listing.title} 
                                 width={50} 
                                 height={50} 
@@ -88,7 +88,7 @@ export function ListingsTable({ listings, filters }: ListingsTableProps) {
                     <TableCell>{formatDistanceToNow(new Date(listing.last_modified_timestamp * 1000), { addSuffix: true })}</TableCell>
                     <TableCell>
                       <div className="max-w-[250px] max-h-20 overflow-y-auto text-xs text-muted-foreground">
-                        {listing.tags.join(', ')}
+                        {listing.tags?.join(', ') ?? 'No Tags'}
                       </div>
                     </TableCell>
                     <TableCell>
