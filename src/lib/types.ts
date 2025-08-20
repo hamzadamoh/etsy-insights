@@ -36,7 +36,6 @@ export interface TrendAnalysis {
 export interface EtsyData {
     shop: EtsyShop;
     listings: EtsyListing[];
-    trendAnalysis: TrendAnalysis;
 }
 
 export type FilterState = {

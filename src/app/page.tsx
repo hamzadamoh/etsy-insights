@@ -14,7 +14,7 @@ export default function Home() {
               Etsy Insights
             </h1>
             <p className="mt-3 text-lg text-muted-foreground max-w-2xl mx-auto">
-              Uncover product trends and analyze any Etsy store. Enter a store name and filters to get started.
+              Analyze individual Etsy stores or bulk analyze multiple shops. Get shop insights, sales data, and copy results to Google Sheets.
             </p>
           </header>
           

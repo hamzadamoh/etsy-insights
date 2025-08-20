@@ -1,5 +1,6 @@
 'use client';
 
+import React, { useState, useMemo } from 'react';
 import {
   Table,
   TableBody,
@@ -13,7 +14,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import type { EtsyListing, FilterState } from '@/lib/types';
-import { Heart, Eye, Calendar, Tag, ExternalLink, Package,Zap } from 'lucide-react';
+import { Heart, Eye, Calendar, Tag, ExternalLink, Package, Zap, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import Image from 'next/image';
 
@@ -21,6 +22,9 @@ interface ListingsTableProps {
   listings: EtsyListing[];
   filters: FilterState;
 }
+
+type SortField = 'favorites' | 'views' | 'age' | 'stock' | 'lastModified';
+type SortDirection = 'asc' | 'desc';
 
 const HighlightCell = ({ children, isGood }: { children: React.ReactNode, isGood: boolean }) => (
   <TableCell className={cn(isGood ? 'bg-accent/30' : 'bg-destructive/10')}>
@@ -31,8 +35,63 @@ const HighlightCell = ({ children, isGood }: { children: React.ReactNode, isGood
 );
 
 export function ListingsTable({ listings, filters }: ListingsTableProps) {
+  const [sortField, setSortField] = useState<SortField>('favorites');
+  const [sortDirection, setSortDirection] = useState<SortDirection>('desc');
+
   const getDaysSince = (timestamp: number) => {
     return Math.ceil((new Date().getTime() - new Date(timestamp * 1000).getTime()) / (1000 * 60 * 60 * 24));
+  };
+
+  const handleSort = (field: SortField) => {
+    if (sortField === field) {
+      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortField(field);
+      setSortDirection('desc');
+    }
+  };
+
+  const sortedListings = useMemo(() => {
+    return [...listings].sort((a, b) => {
+      let aValue: number;
+      let bValue: number;
+
+      switch (sortField) {
+        case 'favorites':
+          aValue = a.num_favorers;
+          bValue = b.num_favorers;
+          break;
+        case 'views':
+          aValue = a.views;
+          bValue = b.views;
+          break;
+        case 'age':
+          aValue = getDaysSince(a.original_creation_timestamp);
+          bValue = getDaysSince(b.original_creation_timestamp);
+          break;
+        case 'stock':
+          aValue = a.quantity;
+          bValue = b.quantity;
+          break;
+        case 'lastModified':
+          aValue = a.last_modified_timestamp;
+          bValue = b.last_modified_timestamp;
+          break;
+        default:
+          return 0;
+      }
+
+      if (sortDirection === 'asc') {
+        return aValue - bValue;
+      } else {
+        return bValue - aValue;
+      }
+    });
+  }, [listings, sortField, sortDirection]);
+
+  const getSortIcon = (field: SortField) => {
+    if (sortField !== field) return <ArrowUpDown className="h-4 w-4" />;
+    return sortDirection === 'asc' ? <ArrowUp className="h-4 w-4" /> : <ArrowDown className="h-4 w-4" />;
   };
 
   return (
@@ -46,16 +105,66 @@ export function ListingsTable({ listings, filters }: ListingsTableProps) {
             <TableHeader>
               <TableRow>
                 <TableHead>Product</TableHead>
-                <TableHead><Heart className="inline-block h-4 w-4 mr-1" />Favorites</TableHead>
-                <TableHead><Eye className="inline-block h-4 w-4 mr-1" />Views</TableHead>
-                <TableHead><Calendar className="inline-block h-4 w-4 mr-1" />Age</TableHead>
-                <TableHead>Last Modified</TableHead>
+                <TableHead>
+                  <Button 
+                    variant="ghost" 
+                    onClick={() => handleSort('favorites')}
+                    className="h-auto p-0 font-medium hover:bg-transparent"
+                  >
+                    <Heart className="inline-block h-4 w-4 mr-1" />
+                    Favorites
+                    {getSortIcon('favorites')}
+                  </Button>
+                </TableHead>
+                <TableHead>
+                  <Button 
+                    variant="ghost" 
+                    onClick={() => handleSort('views')}
+                    className="h-auto p-0 font-medium hover:bg-transparent"
+                  >
+                    <Eye className="inline-block h-4 w-4 mr-1" />
+                    Views
+                    {getSortIcon('views')}
+                  </Button>
+                </TableHead>
+                <TableHead>
+                  <Button 
+                    variant="ghost" 
+                    onClick={() => handleSort('age')}
+                    className="h-auto p-0 font-medium hover:bg-transparent"
+                  >
+                    <Calendar className="inline-block h-4 w-4 mr-1" />
+                    Age
+                    {getSortIcon('age')}
+                  </Button>
+                </TableHead>
+                <TableHead>
+                  <Button 
+                    variant="ghost" 
+                    onClick={() => handleSort('stock')}
+                    className="h-auto p-0 font-medium hover:bg-transparent"
+                  >
+                    <Package className="inline-block h-4 w-4 mr-1" />
+                    Stock
+                    {getSortIcon('stock')}
+                  </Button>
+                </TableHead>
+                <TableHead>
+                  <Button 
+                    variant="ghost" 
+                    onClick={() => handleSort('lastModified')}
+                    className="h-auto p-0 font-medium hover:bg-transparent"
+                  >
+                    Last Modified
+                    {getSortIcon('lastModified')}
+                  </Button>
+                </TableHead>
                 <TableHead><Tag className="inline-block h-4 w-4 mr-1" />Tags</TableHead>
                 <TableHead>Link</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {listings.map((listing) => {
+              {sortedListings.map((listing) => {
                 const ageInDays = getDaysSince(listing.original_creation_timestamp);
                 const isFavGood = listing.num_favorers >= filters.favorites;
                 const isViewsGood = listing.views >= filters.views;
@@ -85,6 +194,11 @@ export function ListingsTable({ listings, filters }: ListingsTableProps) {
                     <HighlightCell isGood={isFavGood}>{listing.num_favorers.toLocaleString()}</HighlightCell>
                     <HighlightCell isGood={isViewsGood}>{listing.views.toLocaleString()}</HighlightCell>
                     <HighlightCell isGood={isAgeGood}>{ageInDays}d</HighlightCell>
+                    <TableCell className="text-center">
+                      <Badge variant={listing.quantity > 0 ? 'default' : 'destructive'}>
+                        {listing.quantity}
+                      </Badge>
+                    </TableCell>
                     <TableCell>{formatDistanceToNow(new Date(listing.last_modified_timestamp * 1000), { addSuffix: true })}</TableCell>
                     <TableCell>
                       <div className="max-w-[250px] max-h-20 overflow-y-auto text-xs text-muted-foreground">

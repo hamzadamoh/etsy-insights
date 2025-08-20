@@ -5,9 +5,11 @@ import { getEtsyInsights } from '@/app/actions';
 import { EtsyForm } from './etsy-form';
 import { ShopDetails } from './shop-details';
 import { ListingsTable } from './listings-table';
-import { TrendSummary } from './trend-summary';
+import { BulkShopsAnalysis } from './bulk-shops-analysis';
+
 import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import type { EtsyData, FilterState } from '@/lib/types';
 import { AlertCircle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
@@ -47,41 +49,53 @@ export default function EtsyInsightsPage() {
 
   return (
     <div className="space-y-8">
-      <EtsyForm
-        formAction={handleFormSubmit}
-        isSubmitting={isPending}
-        onFilterChange={onFilterChange}
-        initialFilters={filters}
-      />
+      <Tabs defaultValue="single" className="w-full">
+        <TabsList className="grid w-full grid-cols-2">
+          <TabsTrigger value="single">Single Shop Analysis</TabsTrigger>
+          <TabsTrigger value="bulk">Bulk Shop Analysis</TabsTrigger>
+        </TabsList>
+        
+        <TabsContent value="single" className="space-y-8">
+          <EtsyForm
+            formAction={handleFormSubmit}
+            isSubmitting={isPending}
+            onFilterChange={onFilterChange}
+            initialFilters={filters}
+          />
 
-      {isPending && !etsyData && (
-        <div className="space-y-8">
-          <Skeleton className="h-32 w-full rounded-lg" />
-          <Skeleton className="h-24 w-full rounded-lg" />
-          <div className="space-y-2">
-            <Skeleton className="h-12 w-full" />
-            <Skeleton className="h-16 w-full" />
-            <Skeleton className="h-16 w-full" />
-            <Skeleton className="h-16 w-full" />
-          </div>
-        </div>
-      )}
-      
-      {state.error && !isPending && !etsyData && (
-        <Alert variant="destructive" className="mt-8">
-            <AlertCircle className="h-4 w-4" />
-            <AlertTitle>Error</AlertTitle>
-            <AlertDescription>{state.error}</AlertDescription>
-        </Alert>
-      )}
+          {isPending && !etsyData && (
+            <div className="space-y-8">
+              <Skeleton className="h-32 w-full rounded-lg" />
+              <Skeleton className="h-24 w-full rounded-lg" />
+              <div className="space-y-2">
+                <Skeleton className="h-12 w-full" />
+                <Skeleton className="h-16 w-full" />
+                <Skeleton className="h-16 w-full" />
+                <Skeleton className="h-16 w-full" />
+              </div>
+            </div>
+          )}
+          
+          {state.error && !isPending && !etsyData && (
+            <Alert variant="destructive" className="mt-8">
+                <AlertCircle className="h-4 w-4" />
+                <AlertTitle>Error</AlertTitle>
+                <AlertDescription>{state.error}</AlertDescription>
+            </Alert>
+          )}
 
-      {etsyData && !isPending && (
-        <div className="space-y-8">
-          <TrendSummary summary={etsyData.trendAnalysis.summary} />
-          <ShopDetails shop={etsyData.shop} filters={filters} />
-          <ListingsTable listings={etsyData.listings} filters={filters} />
-        </div>
-      )}
+          {etsyData && !isPending && (
+            <div className="space-y-8">
+              <ShopDetails shop={etsyData.shop} filters={filters} />
+              <ListingsTable listings={etsyData.listings} filters={filters} />
+            </div>
+          )}
+        </TabsContent>
+        
+        <TabsContent value="bulk">
+          <BulkShopsAnalysis />
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }

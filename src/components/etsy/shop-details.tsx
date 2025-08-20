@@ -4,7 +4,10 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import type { EtsyShop, FilterState } from '@/lib/types';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Copy } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
+import { useToast } from '@/hooks/use-toast';
 
 interface ShopDetailsProps {
   shop: EtsyShop;
@@ -28,21 +31,50 @@ const StatCard = ({ title, value, status }: { title: string; value: string | num
 
 export function ShopDetails({ shop, filters }: ShopDetailsProps) {
   const shopAgeInDays = Math.ceil((new Date().getTime() - new Date(shop.create_date * 1000).getTime()) / (1000 * 60 * 60 * 24));
+  const { toast } = useToast();
+
+  const handleCopy = async () => {
+    const dataToCopy = `${shop.shop_name}\t${shopAgeInDays}\t${shop.transaction_sold_count}`;
+    try {
+      await navigator.clipboard.writeText(dataToCopy);
+      toast({
+        title: "Copied!",
+        description: "Shop name, age, and sales copied to clipboard",
+      });
+    } catch (err) {
+      toast({
+        variant: "destructive",
+        title: "Copy failed",
+        description: "Failed to copy to clipboard",
+      });
+    }
+  };
 
   return (
     <Card>
       <CardHeader>
-        <div className="flex items-center gap-4">
-          <Avatar className="h-16 w-16 border-2 border-primary/50">
-            <AvatarImage src={shop.icon_url_fullxfull || ''} alt={shop.shop_name} />
-            <AvatarFallback>{shop.shop_name.charAt(0)}</AvatarFallback>
-          </Avatar>
-          <div>
-            <CardTitle className="text-2xl">{shop.shop_name}</CardTitle>
-            <CardDescription>
-              On Etsy for {formatDistanceToNow(new Date(shop.create_date * 1000))}
-            </CardDescription>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <Avatar className="h-16 w-16 border-2 border-primary/50">
+              <AvatarImage src={shop.icon_url_fullxfull || ''} alt={shop.shop_name} />
+              <AvatarFallback>{shop.shop_name.charAt(0)}</AvatarFallback>
+            </Avatar>
+            <div>
+              <CardTitle className="text-2xl">{shop.shop_name}</CardTitle>
+              <CardDescription>
+                On Etsy for {formatDistanceToNow(new Date(shop.create_date * 1000))}
+              </CardDescription>
+            </div>
           </div>
+          <Button
+            onClick={handleCopy}
+            variant="outline"
+            size="sm"
+            className="flex items-center gap-2"
+          >
+            <Copy className="h-4 w-4" />
+            Copy Data
+          </Button>
         </div>
       </CardHeader>
       <CardContent>

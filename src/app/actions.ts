@@ -1,8 +1,7 @@
 'use server';
 
 import { z } from 'zod';
-import { etsyTrendSpotter } from '@/ai/flows/etsy-trend-spotter';
-import type { EtsyApiResponse, EtsyData, EtsyListing, EtsyShop, TrendAnalysis } from '@/lib/types';
+import type { EtsyApiResponse, EtsyData, EtsyListing, EtsyShop } from '@/lib/types';
 
 const FormSchema = z.object({
   storeName: z.string().min(1, 'Store name is required'),
@@ -66,18 +65,10 @@ export async function getEtsyInsights(
     const listingsData = await fetchFromEtsy<EtsyApiResponse<EtsyListing>>(listingsUrl);
     const listings = listingsData.results || [];
     
-    // 3. Get AI Trend Analysis
-    const allTags = listings.flatMap(listing => listing.tags || []);
-    let trendAnalysis: TrendAnalysis = { summary: 'No tags found for trend analysis.' };
-    if (allTags.length > 0) {
-        trendAnalysis = await etsyTrendSpotter({ tags: allTags });
-    }
-
     return {
       data: {
         shop,
         listings,
-        trendAnalysis,
       },
       error: null,
     };
