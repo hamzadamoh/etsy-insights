@@ -6,6 +6,7 @@ import { EtsyForm } from './etsy-form';
 import { ShopDetails } from './shop-details';
 import { ListingsTable } from './listings-table';
 import { BulkShopsAnalysis } from './bulk-shops-analysis';
+import { ProductTimelineChart } from './product-timeline-chart';
 
 import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
@@ -63,18 +64,19 @@ export default function EtsyInsightsPage() {
             initialFilters={filters}
           />
 
-          {isPending && !etsyData && (
-            <div className="space-y-8">
-              <Skeleton className="h-32 w-full rounded-lg" />
-              <Skeleton className="h-24 w-full rounded-lg" />
-              <div className="space-y-2">
-                <Skeleton className="h-12 w-full" />
-                <Skeleton className="h-16 w-full" />
-                <Skeleton className="h-16 w-full" />
-                <Skeleton className="h-16 w-full" />
-              </div>
-            </div>
-          )}
+                {isPending && !etsyData && (
+        <div className="space-y-8">
+          <Skeleton className="h-32 w-full rounded-lg" />
+          <Skeleton className="h-24 w-full rounded-lg" />
+          <Skeleton className="h-80 w-full rounded-lg" />
+          <div className="space-y-2">
+            <Skeleton className="h-12 w-full" />
+            <Skeleton className="h-16 w-full" />
+            <Skeleton className="h-16 w-full" />
+            <Skeleton className="h-16 w-full" />
+          </div>
+        </div>
+      )}
           
           {state.error && !isPending && !etsyData && (
             <Alert variant="destructive" className="mt-8">
@@ -87,6 +89,7 @@ export default function EtsyInsightsPage() {
           {etsyData && !isPending && (
             <div className="space-y-8">
               <ShopDetails shop={etsyData.shop} filters={filters} />
+              <ProductTimelineChart listings={etsyData.listings} />
               <ListingsTable listings={etsyData.listings} filters={filters} />
             </div>
           )}
