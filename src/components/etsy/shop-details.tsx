@@ -7,7 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Copy } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
-import { useToast } from '@/hooks/use-toast';
+
 
 interface ShopDetailsProps {
   shop: EtsyShop;
@@ -31,22 +31,14 @@ const StatCard = ({ title, value, status }: { title: string; value: string | num
 
 export function ShopDetails({ shop, filters }: ShopDetailsProps) {
   const shopAgeInDays = Math.ceil((new Date().getTime() - new Date(shop.create_date * 1000).getTime()) / (1000 * 60 * 60 * 24));
-  const { toast } = useToast();
 
   const handleCopy = async () => {
     const dataToCopy = `${shop.shop_name}\t${shopAgeInDays}\t${shop.transaction_sold_count}`;
     try {
       await navigator.clipboard.writeText(dataToCopy);
-      toast({
-        title: "Copied!",
-        description: "Shop name, age, and sales copied to clipboard",
-      });
+      alert("✅ Shop data copied to clipboard!");
     } catch (err) {
-      toast({
-        variant: "destructive",
-        title: "Copy failed",
-        description: "Failed to copy to clipboard",
-      });
+      alert("❌ Failed to copy to clipboard");
     }
   };
 

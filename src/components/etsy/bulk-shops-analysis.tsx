@@ -7,7 +7,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Copy, Loader2, FileSpreadsheet } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
+
 import type { EtsyShop } from '@/lib/types';
 
 interface BulkShopData {
@@ -24,15 +24,11 @@ export function BulkShopsAnalysis() {
   const [shopNames, setShopNames] = useState('');
   const [shopsData, setShopsData] = useState<BulkShopData[]>([]);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const { toast } = useToast();
+
 
   const analyzeShops = async () => {
     if (!shopNames.trim()) {
-      toast({
-        variant: "destructive",
-        title: "No shops entered",
-        description: "Please enter shop names to analyze",
-      });
+      alert("❌ No shops entered. Please enter shop names to analyze.");
       return;
     }
 
@@ -42,11 +38,7 @@ export function BulkShopsAnalysis() {
       .filter(name => name.length > 0);
 
     if (names.length === 0) {
-      toast({
-        variant: "destructive",
-        title: "No valid shop names",
-        description: "Please enter at least one valid shop name",
-      });
+      alert("❌ No valid shop names. Please enter at least one valid shop name.");
       return;
     }
 
@@ -121,16 +113,9 @@ export function BulkShopsAnalysis() {
 
     try {
       await navigator.clipboard.writeText(csvContent);
-      toast({
-        title: "Copied!",
-        description: "Shop data copied to clipboard in tab-separated format",
-      });
+      alert("✅ Shop data copied to clipboard in tab-separated format!");
     } catch (err) {
-      toast({
-        variant: "destructive",
-        title: "Copy failed",
-        description: "Failed to copy to clipboard",
-      });
+      alert("❌ Copy failed. Failed to copy to clipboard.");
     }
   };
 
@@ -145,16 +130,9 @@ export function BulkShopsAnalysis() {
 
     try {
       await navigator.clipboard.writeText(salesText);
-      toast({
-        title: "Sales Copied!",
-        description: "Sales numbers copied to clipboard (one per line)",
-      });
+      alert("✅ Sales numbers copied to clipboard (one per line)!");
     } catch (err) {
-      toast({
-        variant: "destructive",
-        title: "Copy failed",
-        description: "Failed to copy sales to clipboard",
-      });
+      alert("❌ Copy failed. Failed to copy sales to clipboard.");
     }
   };
 
