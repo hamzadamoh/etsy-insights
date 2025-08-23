@@ -84,6 +84,98 @@ export function ShopDetails({ shop, filters }: ShopDetailsProps) {
             <StatCard title="Shop Favorites" value={shop.num_favorers.toLocaleString()} />
             <StatCard title="Active Listings" value={shop.listing_active_count.toLocaleString()} />
         </div>
+        
+        {/* Financial Metrics */}
+        <div className="mt-6 p-4 bg-muted/30 rounded-lg border">
+          <h3 className="text-lg font-semibold mb-3 text-center">Financial Insights</h3>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="text-center">
+              <div className="text-2xl font-bold text-blue-600">
+                {(shop.transaction_sold_count / Math.max(shopAgeInDays, 1)).toFixed(1)}
+              </div>
+              <div className="text-sm text-muted-foreground">Avg Sales/Day</div>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl font-bold text-green-600">
+                {shop.transaction_sold_count > 0 ? 'Active' : 'No Sales'}
+              </div>
+              <div className="text-sm text-muted-foreground">Sales Status</div>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl font-bold text-purple-600">
+                {shop.transaction_sold_count > 0 ? 'Yes' : 'No'}
+              </div>
+              <div className="text-sm text-muted-foreground">Generating Revenue</div>
+            </div>
+          </div>
+          
+          {/* Etsy Fee Calculator */}
+          <div className="mt-4 p-3 bg-background rounded border">
+            <div className="text-sm text-muted-foreground text-center mb-2">
+              💡 Etsy Fee Calculator (Estimated)
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+              <div className="space-y-2">
+                <div className="flex justify-between">
+                  <span>Transaction Fee (6.5%):</span>
+                  <span className="font-mono">-${(shop.transaction_sold_count * 0.065).toFixed(2)}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Payment Processing (3%):</span>
+                  <span className="font-mono">-${(shop.transaction_sold_count * 0.03).toFixed(2)}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Listing Fee ($0.20 each):</span>
+                  <span className="font-mono">-${(shop.listing_active_count * 0.20).toFixed(2)}</span>
+                </div>
+              </div>
+              <div className="space-y-2">
+                <div className="flex justify-between font-semibold">
+                  <span>Total Fees:</span>
+                  <span className="font-mono text-red-600">
+                    -${((shop.transaction_sold_count * 0.095) + (shop.listing_active_count * 0.20)).toFixed(2)}
+                  </span>
+                </div>
+                <div className="flex justify-between font-semibold text-green-600">
+                  <span>Net Revenue:</span>
+                  <span className="font-mono">
+                    ${(shop.transaction_sold_count - ((shop.transaction_sold_count * 0.095) + (shop.listing_active_count * 0.20))).toFixed(2)}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          {/* Revenue Estimates */}
+          <div className="mt-4 p-3 bg-background rounded border">
+            <div className="text-sm text-muted-foreground text-center mb-2">
+              📊 Revenue Estimates (Based on Typical Etsy Pricing)
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+              <div className="text-center">
+                <div className="text-lg font-bold text-blue-600">
+                  ${(shop.transaction_sold_count * 15).toLocaleString()}
+                </div>
+                <div className="text-xs text-muted-foreground">Conservative ($15 avg)</div>
+              </div>
+              <div className="text-center">
+                <div className="text-lg font-bold text-green-600">
+                  ${(shop.transaction_sold_count * 25).toLocaleString()}
+                </div>
+                <div className="text-xs text-muted-foreground">Moderate ($25 avg)</div>
+              </div>
+              <div className="text-center">
+                <div className="text-lg font-bold text-purple-600">
+                  ${(shop.transaction_sold_count * 35).toLocaleString()}
+                </div>
+                <div className="text-xs text-muted-foreground">Premium ($35 avg)</div>
+              </div>
+            </div>
+            <div className="text-xs text-muted-foreground text-center mt-2">
+              *Estimates based on typical Etsy product pricing ranges
+            </div>
+          </div>
+        </div>
         <div className="mt-4 text-center text-sm">
             <p className="text-muted-foreground">
                 Filter criteria: Age {'<='} <span className="font-semibold text-primary">{filters.age} days</span>, 
