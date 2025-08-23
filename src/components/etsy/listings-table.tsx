@@ -14,7 +14,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import type { EtsyListing, FilterState } from '@/lib/types';
-import { Heart, Eye, Calendar, Tag, ExternalLink, Package, Zap, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
+import { Heart, Eye, Calendar, Tag, ExternalLink, Package, Zap, ArrowUpDown, ArrowUp, ArrowDown, Download } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import Image from 'next/image';
 
@@ -37,6 +37,7 @@ const HighlightCell = ({ children, isGood }: { children: React.ReactNode, isGood
 export function ListingsTable({ listings, filters }: ListingsTableProps) {
   const [sortField, setSortField] = useState<SortField>('favorites');
   const [sortDirection, setSortDirection] = useState<SortDirection>('desc');
+  const { toast } = useToast();
 
   const getDaysSince = (timestamp: number) => {
     return Math.ceil((new Date().getTime() - new Date(timestamp * 1000).getTime()) / (1000 * 60 * 60 * 24));
@@ -94,10 +95,120 @@ export function ListingsTable({ listings, filters }: ListingsTableProps) {
     return sortDirection === 'asc' ? <ArrowUp className="h-4 w-4" /> : <ArrowDown className="h-4 w-4" />;
   };
 
+  const downloadCSV = (includeAllData: boolean = false) => {
+    if (!listings || listings.length === 0) {
+      toast({
+        variant: "destructive",
+        title: "No data to download",
+        description: "Please analyze a shop first",
+      });
+      return;
+    }
+
+    try {
+      let headers: string[];
+      let data: any[][];
+
+      if (includeAllData) {
+        // Full data export
+        headers = [
+          'Product Name',
+          'Type',
+          'Favorites',
+          'Views',
+          'Age (days)',
+          'Stock',
+          'Last Modified',
+          'Tags',
+          'Etsy URL'
+        ];
+
+        data = sortedListings.map(listing => {
+          const ageInDays = getDaysSince(listing.original_creation_timestamp);
+          return [
+            listing.title,
+            listing.listing_type,
+            listing.num_favorers,
+            listing.views,
+            ageInDays,
+            listing.quantity,
+            new Date(listing.last_modified_timestamp * 1000).toLocaleDateString(),
+            listing.tags?.join(', ') || 'No Tags',
+            listing.url
+          ];
+        });
+      } else {
+        // Basic export (names and descriptions only)
+        headers = [
+          'Product Name',
+          'Tags',
+          'Etsy URL'
+        ];
+
+        data = sortedListings.map(listing => [
+          listing.title,
+          listing.tags?.join(', ') || 'No Tags',
+          listing.url
+        ]);
+      }
+
+      // Create CSV content
+      const csvContent = [headers, ...data]
+        .map(row => row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(','))
+        .join('\n');
+
+      // Create and download file
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement('a');
+      const url = URL.createObjectURL(blob);
+      link.setAttribute('href', url);
+      link.setAttribute('download', `etsy-listings-${includeAllData ? 'full' : 'basic'}-${new Date().toISOString().split('T')[0]}.csv`);
+      link.style.visibility = 'hidden';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      toast({
+        title: "Download Complete!",
+        description: `CSV file with ${listings.length} listings has been downloaded`,
+      });
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Download Failed",
+        description: "Failed to create CSV file",
+      });
+    }
+  };
+
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Product Listings ({listings.length})</CardTitle>
+        <div className="flex items-center justify-between">
+          <CardTitle>Product Listings ({listings.length})</CardTitle>
+          <div className="flex gap-2">
+            <Button
+              onClick={() => downloadCSV(false)}
+              variant="outline"
+              size="sm"
+              className="flex items-center gap-2"
+              disabled={listings.length === 0}
+            >
+              <Download className="h-4 w-4" />
+              Download Basic CSV
+            </Button>
+            <Button
+              onClick={() => downloadCSV(true)}
+              variant="outline"
+              size="sm"
+              className="flex items-center gap-2"
+              disabled={listings.length === 0}
+            >
+              <Download className="h-4 w-4" />
+              Download Full CSV
+            </Button>
+          </div>
+        </div>
       </CardHeader>
       <CardContent>
         <div className="overflow-x-auto">
