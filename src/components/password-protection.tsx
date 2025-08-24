@@ -28,6 +28,32 @@ export function PasswordProtection({ children }: PasswordProtectionProps) {
       setIsAuthenticated(true);
       setCurrentUser(JSON.parse(userData));
     }
+    
+    // Initialize default team data if it doesn't exist
+    const teamMembersData = localStorage.getItem('etsy-insights-team');
+    if (!teamMembersData) {
+      const defaultMembers = [
+        {
+          id: 'admin-001',
+          name: 'Admin User',
+          email: 'admin@etsyinsights.com',
+          password: 'admin123',
+          role: 'admin',
+          status: 'active',
+          createdAt: new Date().toISOString(),
+        },
+        {
+          id: 'user-001',
+          name: 'John Doe',
+          email: 'john@company.com',
+          password: 'team2024',
+          role: 'user',
+          status: 'active',
+          createdAt: new Date().toISOString(),
+        }
+      ];
+      localStorage.setItem('etsy-insights-team', JSON.stringify(defaultMembers));
+    }
   }, []);
 
   const handleSubmit = (e: React.FormEvent) => {
