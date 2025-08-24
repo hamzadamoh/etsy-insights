@@ -7,7 +7,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Copy, Loader2, FileSpreadsheet } from 'lucide-react';
-
+import { useToast } from '@/components/ui/toast';
 import type { EtsyShop } from '@/lib/types';
 
 interface BulkShopData {
@@ -21,6 +21,7 @@ interface BulkShopData {
 }
 
 export function BulkShopsAnalysis() {
+  const { showToast } = useToast();
   const [shopNames, setShopNames] = useState('');
   const [shopsData, setShopsData] = useState<BulkShopData[]>([]);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
@@ -28,7 +29,7 @@ export function BulkShopsAnalysis() {
 
   const analyzeShops = async () => {
     if (!shopNames.trim()) {
-      alert("❌ No shops entered. Please enter shop names to analyze.");
+      showToast("No shops entered. Please enter shop names to analyze.", "error");
       return;
     }
 
@@ -38,7 +39,7 @@ export function BulkShopsAnalysis() {
       .filter(name => name.length > 0);
 
     if (names.length === 0) {
-      alert("❌ No valid shop names. Please enter at least one valid shop name.");
+      showToast("No valid shop names. Please enter at least one valid shop name.", "error");
       return;
     }
 
@@ -113,9 +114,9 @@ export function BulkShopsAnalysis() {
 
     try {
       await navigator.clipboard.writeText(csvContent);
-      alert("✅ Shop data copied to clipboard in tab-separated format!");
+      showToast("Shop data copied to clipboard in tab-separated format!", "success");
     } catch (err) {
-      alert("❌ Copy failed. Failed to copy to clipboard.");
+      showToast("Copy failed. Failed to copy to clipboard.", "error");
     }
   };
 
@@ -130,9 +131,9 @@ export function BulkShopsAnalysis() {
 
     try {
       await navigator.clipboard.writeText(salesText);
-      alert("✅ Sales numbers copied to clipboard (one per line)!");
+      showToast("Sales numbers copied to clipboard (one per line)!", "success");
     } catch (err) {
-      alert("❌ Copy failed. Failed to copy sales to clipboard.");
+      showToast("Copy failed. Failed to copy sales to clipboard.", "error");
     }
   };
 

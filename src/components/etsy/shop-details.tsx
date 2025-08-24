@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Copy } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
+import { useToast } from '@/components/ui/toast';
 
 
 interface ShopDetailsProps {
@@ -30,15 +31,16 @@ const StatCard = ({ title, value, status }: { title: string; value: string | num
 };
 
 export function ShopDetails({ shop, filters }: ShopDetailsProps) {
+  const { showToast } = useToast();
   const shopAgeInDays = Math.ceil((new Date().getTime() - new Date(shop.create_date * 1000).getTime()) / (1000 * 60 * 60 * 24));
 
   const handleCopy = async () => {
     const dataToCopy = `${shop.shop_name}\t${shopAgeInDays}\t${shop.transaction_sold_count}`;
     try {
       await navigator.clipboard.writeText(dataToCopy);
-      alert("✅ Shop data copied to clipboard!");
+      showToast("Shop data copied to clipboard!", "success");
     } catch (err) {
-      alert("❌ Failed to copy to clipboard");
+      showToast("Failed to copy to clipboard", "error");
     }
   };
 

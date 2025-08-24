@@ -22,6 +22,7 @@ import {
   CheckCircle,
   XCircle
 } from 'lucide-react';
+import { useToast } from '@/components/ui/toast';
 
 interface TeamMember {
   id: string;
@@ -39,6 +40,7 @@ interface AdminPanelProps {
 }
 
 export function AdminPanel({ onClose }: AdminPanelProps) {
+  const { showToast } = useToast();
   const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
   const [isAddingMember, setIsAddingMember] = useState(false);
   const [editingMember, setEditingMember] = useState<TeamMember | null>(null);
@@ -111,7 +113,7 @@ export function AdminPanel({ onClose }: AdminPanelProps) {
 
   const deleteTeamMember = (id: string) => {
     if (teamMembers.find(m => m.id === id)?.role === 'admin') {
-      alert('Cannot delete admin users');
+      showToast('Cannot delete admin users', 'error');
       return;
     }
     const updatedMembers = teamMembers.filter(member => member.id !== id);
@@ -124,7 +126,7 @@ export function AdminPanel({ onClose }: AdminPanelProps) {
       setCopiedId(id);
       setTimeout(() => setCopiedId(null), 2000);
     } catch (err) {
-      alert('Failed to copy password');
+      showToast('Failed to copy password', 'error');
     }
   };
 
@@ -288,14 +290,14 @@ export function AdminPanel({ onClose }: AdminPanelProps) {
                 </Button>
                 <Button
                   variant="outline"
-                  onClick={() => {
-                    const updatedMembers = teamMembers.map(member => ({
-                      ...member,
-                      password: generatePassword()
-                    }));
-                    saveTeamMembers(updatedMembers);
-                    alert('All passwords have been reset!');
-                  }}
+                                     onClick={() => {
+                     const updatedMembers = teamMembers.map(member => ({
+                       ...member,
+                       password: generatePassword()
+                     }));
+                     saveTeamMembers(updatedMembers);
+                     showToast('All passwords have been reset!', 'success');
+                   }}
                 >
                   Reset All Passwords
                 </Button>
@@ -329,6 +331,7 @@ export function AdminPanel({ onClose }: AdminPanelProps) {
 
 // Add Member Form Component
 function AddMemberForm({ onSubmit }: { onSubmit: (member: Omit<TeamMember, 'id' | 'createdAt'>) => void }) {
+  const { showToast } = useToast();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -340,7 +343,7 @@ function AddMemberForm({ onSubmit }: { onSubmit: (member: Omit<TeamMember, 'id' 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.name || !formData.email || !formData.password) {
-      alert('Please fill in all fields');
+      showToast('Please fill in all fields', 'error');
       return;
     }
     onSubmit(formData);
