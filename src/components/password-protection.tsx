@@ -4,7 +4,8 @@ import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Lock, Eye, EyeOff } from 'lucide-react';
+import { Lock, Eye, EyeOff, Shield, Users } from 'lucide-react';
+import { AdminPanel } from './admin-panel';
 
 interface PasswordProtectionProps {
   children: React.ReactNode;
@@ -16,24 +17,48 @@ export function PasswordProtection({ children }: PasswordProtectionProps) {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [attempts, setAttempts] = useState(0);
+  const [showAdminPanel, setShowAdminPanel] = useState(false);
+  const [currentUser, setCurrentUser] = useState<any>(null);
 
   // Check if already authenticated on component mount
   useEffect(() => {
     const authStatus = localStorage.getItem('etsy-insights-auth');
-    if (authStatus === 'true') {
+    const userData = localStorage.getItem('etsy-insights-user');
+    if (authStatus === 'true' && userData) {
       setIsAuthenticated(true);
+      setCurrentUser(JSON.parse(userData));
     }
   }, []);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Simple password check - you can change this to any password you want
-    const correctPassword = 'etsy2024'; // Change this to your desired password
+    // Get team members from localStorage
+    const teamMembersData = localStorage.getItem('etsy-insights-team');
+    if (!teamMembersData) {
+      setError('Team data not found. Please contact admin.');
+      return;
+    }
     
-    if (password === correctPassword) {
+    const teamMembers = JSON.parse(teamMembersData);
+    const user = teamMembers.find((member: any) => 
+      member.password === password && member.status === 'active'
+    );
+    
+    if (user) {
       setIsAuthenticated(true);
+      setCurrentUser(user);
       localStorage.setItem('etsy-insights-auth', 'true');
+      localStorage.setItem('etsy-insights-user', JSON.stringify(user));
+      
+      // Update last login
+      const updatedMembers = teamMembers.map((member: any) =>
+        member.id === user.id 
+          ? { ...member, lastLogin: new Date().toISOString() }
+          : member
+      );
+      localStorage.setItem('etsy-insights-team', JSON.stringify(updatedMembers));
+      
       setError('');
       setAttempts(0);
     } else {
@@ -53,14 +78,27 @@ export function PasswordProtection({ children }: PasswordProtectionProps) {
 
   const handleLogout = () => {
     setIsAuthenticated(false);
+    setCurrentUser(null);
     localStorage.removeItem('etsy-insights-auth');
+    localStorage.removeItem('etsy-insights-user');
     setPassword('');
   };
 
   if (isAuthenticated) {
     return (
       <div>
-        <div className="fixed top-4 right-4 z-50">
+        <div className="fixed top-4 right-4 z-50 flex gap-2">
+          {currentUser?.role === 'admin' && (
+            <Button
+              onClick={() => setShowAdminPanel(true)}
+              variant="outline"
+              size="sm"
+              className="bg-background/80 backdrop-blur-sm"
+            >
+              <Shield className="h-4 w-4 mr-2" />
+              Admin
+            </Button>
+          )}
           <Button
             onClick={handleLogout}
             variant="outline"
@@ -71,6 +109,11 @@ export function PasswordProtection({ children }: PasswordProtectionProps) {
             Logout
           </Button>
         </div>
+        
+        {showAdminPanel && (
+          <AdminPanel onClose={() => setShowAdminPanel(false)} />
+        )}
+        
         {children}
       </div>
     );
@@ -132,10 +175,10 @@ export function PasswordProtection({ children }: PasswordProtectionProps) {
           
           <div className="mt-4 text-center">
             <p className="text-xs text-muted-foreground">
-              Password: <code className="bg-muted px-1 py-0.5 rounded">etsy2024</code>
+              Contact your admin for login credentials
             </p>
             <p className="text-xs text-muted-foreground mt-1">
-              Change this in the code for production use
+              Default admin: admin@etsyinsights.com / admin123
             </p>
           </div>
         </CardContent>
