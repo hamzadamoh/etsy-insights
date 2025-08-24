@@ -1,9 +1,10 @@
 import EtsyInsightsPage from '@/components/etsy/etsy-insights-page';
+import { PasswordProtection } from '@/components/password-protection';
 import { Store } from 'lucide-react';
 
 export default function Home() {
   return (
-    <>
+    <PasswordProtection>
       <main className="min-h-screen bg-background">
         <div className="container mx-auto px-4 py-8">
           <header className="text-center mb-8 no-print">
@@ -27,6 +28,6 @@ export default function Home() {
       <footer className="py-6 text-center text-sm text-muted-foreground no-print">
         Etsy Insights © {new Date().getFullYear()}
       </footer>
-    </>
+    </PasswordProtection>
   );
 }
