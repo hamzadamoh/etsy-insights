@@ -203,9 +203,6 @@ export function PasswordProtection({ children }: PasswordProtectionProps) {
             <p className="text-xs text-muted-foreground">
               Contact your admin for login credentials
             </p>
-            <p className="text-xs text-muted-foreground mt-1">
-              Default admin: admin@etsyinsights.com / admin123
-            </p>
           </div>
         </CardContent>
       </Card>
