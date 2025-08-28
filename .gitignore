@@ -1,8 +1,20 @@
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
 # Dependencies
 node_modules/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+.pnpm-debug.log*
+
+# Yarn
+/.pnp
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/versions
 
 # Environment variables
 .env
@@ -10,6 +22,7 @@ yarn-error.log*
 .env.development.local
 .env.test.local
 .env.production.local
+.env*
 
 # Next.js
 .next/
@@ -18,6 +31,9 @@ build/
 
 # Production
 /build
+
+# Testing
+/coverage
 
 # Misc
 .DS_Store
@@ -44,6 +60,13 @@ next-env.d.ts
 
 # OS
 Thumbs.db
+
+# Genkit
+.genkit/*
+
+# Firebase
+firebase-debug.log
+firestore-debug.log
 
 # Temporary files
 fix-users.js
