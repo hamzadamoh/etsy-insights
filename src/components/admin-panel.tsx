@@ -14,25 +14,23 @@ import {
   UserPlus, 
   Edit, 
   Trash2, 
-  Eye, 
-  EyeOff, 
-  Shield, 
-  Key,
+  Shield,
   Copy,
   CheckCircle,
-  XCircle
 } from 'lucide-react';
 import { useToast } from '@/components/ui/toast';
+import { db, auth } from '@/lib/firebase';
+import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { collection, getDocs, doc, setDoc, updateDoc, deleteDoc, serverTimestamp } from 'firebase/firestore';
 
 interface TeamMember {
   id: string;
   name: string;
   email: string;
-  password: string;
   role: 'admin' | 'user';
   status: 'active' | 'inactive';
-  lastLogin?: string;
-  createdAt: string;
+  lastLogin?: any;
+  createdAt: any;
 }
 
 interface AdminPanelProps {
@@ -44,95 +42,78 @@ export function AdminPanel({ onClose }: AdminPanelProps) {
   const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
   const [isAddingMember, setIsAddingMember] = useState(false);
   const [editingMember, setEditingMember] = useState<TeamMember | null>(null);
-  const [showPasswords, setShowPasswords] = useState(false);
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
-  // Initialize with default admin and some sample users
+  const fetchTeamMembers = async () => {
+    const querySnapshot = await getDocs(collection(db, 'users'));
+    const members = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as TeamMember));
+    setTeamMembers(members);
+  };
+
   useEffect(() => {
-    const savedMembers = localStorage.getItem('etsy-insights-team');
-    if (savedMembers) {
-      setTeamMembers(JSON.parse(savedMembers));
-    } else {
-      const defaultMembers: TeamMember[] = [
-        {
-          id: 'admin-001',
-          name: 'Admin User',
-          email: 'admin@etsyinsights.com',
-          password: 'admin123',
-          role: 'admin',
-          status: 'active',
-          createdAt: new Date().toISOString(),
-        },
-        {
-          id: 'user-001',
-          name: 'John Doe',
-          email: 'john@company.com',
-          password: 'team2024',
-          role: 'user',
-          status: 'active',
-          createdAt: new Date().toISOString(),
-        }
-      ];
-      setTeamMembers(defaultMembers);
-      localStorage.setItem('etsy-insights-team', JSON.stringify(defaultMembers));
-    }
+    fetchTeamMembers();
   }, []);
 
-  const saveTeamMembers = (members: TeamMember[]) => {
-    setTeamMembers(members);
-    localStorage.setItem('etsy-insights-team', JSON.stringify(members));
-  };
-
-  const generatePassword = () => {
-    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*';
-    let password = '';
-    for (let i = 0; i < 12; i++) {
-      password += chars.charAt(Math.floor(Math.random() * chars.length));
-    }
-    return password;
-  };
-
-  const addTeamMember = (memberData: Omit<TeamMember, 'id' | 'createdAt'>) => {
-    const newMember: TeamMember = {
-      ...memberData,
-      id: `user-${Date.now()}`,
-      createdAt: new Date().toISOString(),
-    };
-    const updatedMembers = [...teamMembers, newMember];
-    saveTeamMembers(updatedMembers);
-    setIsAddingMember(false);
-  };
-
-  const updateTeamMember = (id: string, updates: Partial<TeamMember>) => {
-    const updatedMembers = teamMembers.map(member =>
-      member.id === id ? { ...member, ...updates } : member
-    );
-    saveTeamMembers(updatedMembers);
-    setEditingMember(null);
-  };
-
-  const deleteTeamMember = (id: string) => {
-    if (teamMembers.find(m => m.id === id)?.role === 'admin') {
-      showToast('Cannot delete admin users', 'error');
-      return;
-    }
-    const updatedMembers = teamMembers.filter(member => member.id !== id);
-    saveTeamMembers(updatedMembers);
-  };
-
-  const copyPassword = async (password: string, id: string) => {
+  const addTeamMember = async (memberData: Omit<TeamMember, 'id' | 'createdAt'> & { password?: string }) => {
     try {
-      await navigator.clipboard.writeText(password);
+      if (!memberData.password) {
+        showToast('Password is required', 'error');
+        return;
+      }
+      const userCredential = await createUserWithEmailAndPassword(auth, memberData.email, memberData.password);
+      const user = userCredential.user;
+
+      const newMember = {
+        name: memberData.name,
+        email: memberData.email,
+        role: memberData.role,
+        status: memberData.status,
+        createdAt: serverTimestamp(),
+        lastLogin: null
+      };
+
+      await setDoc(doc(db, 'users', user.uid), newMember);
+      fetchTeamMembers();
+      setIsAddingMember(false);
+      showToast('Team member added successfully', 'success');
+    } catch (error: any) {
+      showToast(error.message, 'error');
+    }
+  };
+
+  const updateTeamMember = async (id: string, updates: Partial<TeamMember>) => {
+    try {
+      const userRef = doc(db, 'users', id);
+      await updateDoc(userRef, updates);
+      fetchTeamMembers();
+      setEditingMember(null);
+      showToast('Team member updated successfully', 'success');
+    } catch (error: any) {
+      showToast(error.message, 'error');
+    }
+  };
+
+  const deleteTeamMember = async (id: string) => {
+    try {
+      const userRef = doc(db, 'users', id);
+      await deleteDoc(userRef);
+      // Note: This does not delete the user from Firebase Auth to prevent re-registration issues.
+      // You might want to disable the user instead.
+      fetchTeamMembers();
+      showToast('Team member deleted successfully', 'success');
+    } catch (error: any) {
+      showToast(error.message, 'error');
+    }
+  };
+  
+  const copyToClipboard = async (text: string, id: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
       setCopiedId(id);
       setTimeout(() => setCopiedId(null), 2000);
     } catch (err) {
-      showToast('Failed to copy password', 'error');
+      showToast('Failed to copy', 'error');
     }
-  };
-
-  const resetPassword = (id: string) => {
-    const newPassword = generatePassword();
-    updateTeamMember(id, { password: newPassword });
   };
 
   return (
@@ -155,7 +136,6 @@ export function AdminPanel({ onClose }: AdminPanelProps) {
           </CardHeader>
           <CardContent className="space-y-6">
             
-            {/* Add New Member */}
             <div className="flex justify-between items-center">
               <h3 className="text-lg font-semibold">Team Members</h3>
               <Dialog open={isAddingMember} onOpenChange={setIsAddingMember}>
@@ -174,7 +154,6 @@ export function AdminPanel({ onClose }: AdminPanelProps) {
               </Dialog>
             </div>
 
-            {/* Team Members Table */}
             <div className="border rounded-lg">
               <Table>
                 <TableHeader>
@@ -183,8 +162,7 @@ export function AdminPanel({ onClose }: AdminPanelProps) {
                     <TableHead>Email</TableHead>
                     <TableHead>Role</TableHead>
                     <TableHead>Status</TableHead>
-                    <TableHead>Password</TableHead>
-                    <TableHead>Last Login</TableHead>
+                    <TableHead>User ID</TableHead>
                     <TableHead>Actions</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -203,29 +181,17 @@ export function AdminPanel({ onClose }: AdminPanelProps) {
                           {member.status}
                         </Badge>
                       </TableCell>
-                      <TableCell>
+                       <TableCell>
                         <div className="flex items-center gap-2">
-                          <span className="font-mono">
-                            {showPasswords ? member.password : '••••••••'}
-                          </span>
-                          <Button
+                           <span className="font-mono text-xs">{member.id}</span>
+                           <Button
                             variant="ghost"
                             size="sm"
-                            onClick={() => setShowPasswords(!showPasswords)}
-                          >
-                            {showPasswords ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => copyPassword(member.password, member.id)}
+                            onClick={() => copyToClipboard(member.id, member.id)}
                           >
                             {copiedId === member.id ? <CheckCircle className="h-4 w-4 text-green-600" /> : <Copy className="h-4 w-4" />}
                           </Button>
                         </div>
-                      </TableCell>
-                      <TableCell>
-                        {member.lastLogin ? new Date(member.lastLogin).toLocaleDateString() : 'Never'}
                       </TableCell>
                       <TableCell>
                         <div className="flex gap-2">
@@ -251,15 +217,6 @@ export function AdminPanel({ onClose }: AdminPanelProps) {
                             </DialogContent>
                           </Dialog>
                           
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => resetPassword(member.id)}
-                            className="text-orange-600 hover:text-orange-700"
-                          >
-                            <Key className="h-4 w-4" />
-                          </Button>
-                          
                           {member.role !== 'admin' && (
                             <Button
                               variant="ghost"
@@ -277,51 +234,6 @@ export function AdminPanel({ onClose }: AdminPanelProps) {
                 </TableBody>
               </Table>
             </div>
-
-            {/* Admin Actions */}
-            <div className="bg-muted/30 p-4 rounded-lg">
-              <h4 className="font-semibold mb-3">Admin Actions</h4>
-              <div className="flex gap-2">
-                <Button
-                  variant="outline"
-                  onClick={() => setShowPasswords(!showPasswords)}
-                >
-                  {showPasswords ? 'Hide' : 'Show'} Passwords
-                </Button>
-                <Button
-                  variant="outline"
-                                     onClick={() => {
-                     const updatedMembers = teamMembers.map(member => ({
-                       ...member,
-                       password: generatePassword()
-                     }));
-                     saveTeamMembers(updatedMembers);
-                     showToast('All passwords have been reset!', 'success');
-                   }}
-                >
-                  Reset All Passwords
-                </Button>
-                <Button
-                  variant="outline"
-                  onClick={() => {
-                    const data = teamMembers.map(m => ({
-                      name: m.name,
-                      email: m.email,
-                      password: m.password,
-                      role: m.role
-                    }));
-                    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-                    const url = URL.createObjectURL(blob);
-                    const a = document.createElement('a');
-                    a.href = url;
-                    a.download = 'team-members.json';
-                    a.click();
-                  }}
-                >
-                  Export Team Data
-                </Button>
-              </div>
-            </div>
           </CardContent>
         </Card>
       </div>
@@ -329,8 +241,7 @@ export function AdminPanel({ onClose }: AdminPanelProps) {
   );
 }
 
-// Add Member Form Component
-function AddMemberForm({ onSubmit }: { onSubmit: (member: Omit<TeamMember, 'id' | 'createdAt'>) => void }) {
+function AddMemberForm({ onSubmit }: { onSubmit: (member: Omit<TeamMember, 'id' | 'createdAt'> & { password?: string }) => void }) {
   const { showToast } = useToast();
   const [formData, setFormData] = useState({
     name: '',
@@ -353,39 +264,20 @@ function AddMemberForm({ onSubmit }: { onSubmit: (member: Omit<TeamMember, 'id' 
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
         <Label htmlFor="name">Name</Label>
-        <Input
-          id="name"
-          value={formData.name}
-          onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-          placeholder="Full Name"
-        />
+        <Input id="name" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} placeholder="Full Name" />
       </div>
       <div>
         <Label htmlFor="email">Email</Label>
-        <Input
-          id="email"
-          type="email"
-          value={formData.email}
-          onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-          placeholder="email@company.com"
-        />
+        <Input id="email" type="email" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} placeholder="email@company.com" />
       </div>
       <div>
         <Label htmlFor="password">Password</Label>
-        <Input
-          id="password"
-          type="password"
-          value={formData.password}
-          onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-          placeholder="Enter password"
-        />
+        <Input id="password" type="password" value={formData.password} onChange={(e) => setFormData({ ...formData, password: e.target.value })} placeholder="Enter password" />
       </div>
       <div>
         <Label htmlFor="role">Role</Label>
         <Select value={formData.role} onValueChange={(value: 'admin' | 'user') => setFormData({ ...formData, role: value })}>
-          <SelectTrigger>
-            <SelectValue />
-          </SelectTrigger>
+          <SelectTrigger><SelectValue /></SelectTrigger>
           <SelectContent>
             <SelectItem value="user">User</SelectItem>
             <SelectItem value="admin">Admin</SelectItem>
@@ -395,39 +287,22 @@ function AddMemberForm({ onSubmit }: { onSubmit: (member: Omit<TeamMember, 'id' 
       <div>
         <Label htmlFor="status">Status</Label>
         <Select value={formData.status} onValueChange={(value: 'active' | 'inactive') => setFormData({ ...formData, status: value })}>
-          <SelectTrigger>
-            <SelectValue />
-          </SelectTrigger>
+          <SelectTrigger><SelectValue /></SelectTrigger>
           <SelectContent>
             <SelectItem value="active">Active</SelectItem>
             <SelectItem value="inactive">Inactive</SelectItem>
           </SelectContent>
         </Select>
       </div>
-      <div className="flex gap-2">
-        <Button type="submit" className="flex-1">Add Member</Button>
-        <Button type="button" variant="outline" onClick={() => setFormData({ ...formData, password: generatePassword() })}>
-          Generate Password
-        </Button>
-      </div>
+      <div className="flex gap-2"><Button type="submit" className="flex-1">Add Member</Button></div>
     </form>
   );
 }
 
-// Edit Member Form Component
-function EditMemberForm({ 
-  member, 
-  onSubmit, 
-  onCancel 
-}: { 
-  member: TeamMember; 
-  onSubmit: (updates: Partial<TeamMember>) => void;
-  onCancel: () => void;
-}) {
+function EditMemberForm({ member, onSubmit, onCancel }: { member: TeamMember; onSubmit: (updates: Partial<TeamMember>) => void;onCancel: () => void;}) {
   const [formData, setFormData] = useState({
     name: member.name,
     email: member.email,
-    password: member.password,
     role: member.role,
     status: member.status,
   });
@@ -441,36 +316,16 @@ function EditMemberForm({
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
         <Label htmlFor="edit-name">Name</Label>
-        <Input
-          id="edit-name"
-          value={formData.name}
-          onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-        />
+        <Input id="edit-name" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })}/>
       </div>
       <div>
         <Label htmlFor="edit-email">Email</Label>
-        <Input
-          id="edit-email"
-          type="email"
-          value={formData.email}
-          onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-        />
-      </div>
-      <div>
-        <Label htmlFor="edit-password">Password</Label>
-        <Input
-          id="edit-password"
-          type="password"
-          value={formData.password}
-          onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-        />
+        <Input id="edit-email" type="email" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })}/>
       </div>
       <div>
         <Label htmlFor="edit-role">Role</Label>
         <Select value={formData.role} onValueChange={(value: 'admin' | 'user') => setFormData({ ...formData, role: value })}>
-          <SelectTrigger>
-            <SelectValue />
-          </SelectTrigger>
+          <SelectTrigger><SelectValue /></SelectTrigger>
           <SelectContent>
             <SelectItem value="user">User</SelectItem>
             <SelectItem value="admin">Admin</SelectItem>
@@ -480,29 +335,14 @@ function EditMemberForm({
       <div>
         <Label htmlFor="edit-status">Status</Label>
         <Select value={formData.status} onValueChange={(value: 'active' | 'inactive') => setFormData({ ...formData, status: value })}>
-          <SelectTrigger>
-            <SelectValue />
-          </SelectTrigger>
+          <SelectTrigger><SelectValue /></SelectTrigger>
           <SelectContent>
             <SelectItem value="active">Active</SelectItem>
             <SelectItem value="inactive">Inactive</SelectItem>
           </SelectContent>
         </Select>
       </div>
-      <div className="flex gap-2">
-        <Button type="submit" className="flex-1">Update Member</Button>
-        <Button type="button" variant="outline" onClick={onCancel}>Cancel</Button>
-      </div>
+      <div className="flex gap-2"><Button type="submit" className="flex-1">Update Member</Button><Button type="button" variant="outline" onClick={onCancel}>Cancel</Button></div>
     </form>
   );
-}
-
-// Helper function for generating passwords
-function generatePassword() {
-  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*';
-  let password = '';
-  for (let i = 0; i < 12; i++) {
-    password += chars.charAt(Math.floor(Math.random() * chars.length));
-  }
-  return password;
 }

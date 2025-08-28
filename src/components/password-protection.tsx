@@ -4,8 +4,11 @@ import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Lock, Eye, EyeOff, Shield, Users } from 'lucide-react';
+import { Lock, Eye, EyeOff, Shield } from 'lucide-react';
 import { AdminPanel } from './admin-panel';
+import { auth, db } from '@/lib/firebase';
+import { onAuthStateChanged, signInWithEmailAndPassword, signOut } from 'firebase/auth';
+import { doc, getDoc } from 'firebase/firestore';
 
 interface PasswordProtectionProps {
   children: React.ReactNode;
@@ -13,101 +16,60 @@ interface PasswordProtectionProps {
 
 export function PasswordProtection({ children }: PasswordProtectionProps) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
-  const [attempts, setAttempts] = useState(0);
   const [showAdminPanel, setShowAdminPanel] = useState(false);
   const [currentUser, setCurrentUser] = useState<any>(null);
 
-  // Check if already authenticated on component mount
   useEffect(() => {
-    const authStatus = localStorage.getItem('etsy-insights-auth');
-    const userData = localStorage.getItem('etsy-insights-user');
-    if (authStatus === 'true' && userData) {
-      setIsAuthenticated(true);
-      setCurrentUser(JSON.parse(userData));
-    }
-    
-    // Initialize default team data if it doesn't exist
-    const teamMembersData = localStorage.getItem('etsy-insights-team');
-    if (!teamMembersData) {
-      const defaultMembers = [
-        {
-          id: 'admin-001',
-          name: 'Admin User',
-          email: 'admin@etsyinsights.com',
-          password: 'admin123',
-          role: 'admin',
-          status: 'active',
-          createdAt: new Date().toISOString(),
-        },
-        {
-          id: 'user-001',
-          name: 'John Doe',
-          email: 'john@company.com',
-          password: 'team2024',
-          role: 'user',
-          status: 'active',
-          createdAt: new Date().toISOString(),
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        const userDoc = await getDoc(doc(db, 'users', user.uid));
+        if (userDoc.exists()) {
+          const userData = userDoc.data();
+          setCurrentUser({ ...user, ...userData });
+          setIsAuthenticated(true);
+        } else {
+          // Handle case where user exists in Auth but not in Firestore
+          setIsAuthenticated(false);
         }
-      ];
-      localStorage.setItem('etsy-insights-team', JSON.stringify(defaultMembers));
-    }
+      } else {
+        setIsAuthenticated(false);
+        setCurrentUser(null);
+      }
+    });
+    return () => unsubscribe();
   }, []);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    // Get team members from localStorage
-    const teamMembersData = localStorage.getItem('etsy-insights-team');
-    if (!teamMembersData) {
-      setError('Team data not found. Please contact admin.');
-      return;
-    }
-    
-    const teamMembers = JSON.parse(teamMembersData);
-    const user = teamMembers.find((member: any) => 
-      member.password === password && member.status === 'active'
-    );
-    
-    if (user) {
-      setIsAuthenticated(true);
-      setCurrentUser(user);
-      localStorage.setItem('etsy-insights-auth', 'true');
-      localStorage.setItem('etsy-insights-user', JSON.stringify(user));
-      
-      // Update last login
-      const updatedMembers = teamMembers.map((member: any) =>
-        member.id === user.id 
-          ? { ...member, lastLogin: new Date().toISOString() }
-          : member
-      );
-      localStorage.setItem('etsy-insights-team', JSON.stringify(updatedMembers));
-      
-      setError('');
-      setAttempts(0);
-    } else {
-      setAttempts(prev => prev + 1);
-      setError(`Incorrect password. Attempts: ${attempts + 1}`);
-      
-      // Lock out after 5 attempts for 5 minutes
-      if (attempts >= 4) {
-        setError('Too many failed attempts. Please wait 5 minutes before trying again.');
-        setTimeout(() => {
-          setAttempts(0);
-          setError('');
-        }, 5 * 60 * 1000);
+    setError('');
+    try {
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+      const userDoc = await getDoc(doc(db, 'users', user.uid));
+      if (userDoc.exists()) {
+        const userData = userDoc.data();
+        if (userData.status === 'active') {
+          setCurrentUser({ ...user, ...userData });
+          setIsAuthenticated(true);
+        } else {
+          setError('Your account is inactive. Please contact an admin.');
+        }
+      } else {
+        setError('User data not found.');
       }
+    } catch (error) {
+      setError('Invalid email or password.');
     }
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    await signOut(auth);
     setIsAuthenticated(false);
     setCurrentUser(null);
-    localStorage.removeItem('etsy-insights-auth');
-    localStorage.removeItem('etsy-insights-user');
-    setPassword('');
   };
 
   if (isAuthenticated) {
@@ -154,19 +116,24 @@ export function PasswordProtection({ children }: PasswordProtectionProps) {
           </div>
           <CardTitle className="text-2xl">Etsy Insights</CardTitle>
           <p className="text-muted-foreground">
-            Enter password to access the tool
+            Enter your credentials to access the tool
           </p>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
+             <Input
+                type="email"
+                placeholder="Email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
             <div className="relative">
               <Input
                 type={showPassword ? 'text' : 'password'}
-                placeholder="Enter password"
+                placeholder="Password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className="pr-10"
-                disabled={attempts >= 5}
               />
               <Button
                 type="button"
@@ -189,21 +156,11 @@ export function PasswordProtection({ children }: PasswordProtectionProps) {
               </div>
             )}
             
-            <Button
-              type="submit"
-              className="w-full"
-              disabled={attempts >= 5 || !password.trim()}
-            >
+            <Button type="submit" className="w-full">
               <Lock className="h-4 w-4 mr-2" />
               Access Tool
             </Button>
           </form>
-          
-          <div className="mt-4 text-center">
-            <p className="text-xs text-muted-foreground">
-              Contact your admin for login credentials
-            </p>
-          </div>
         </CardContent>
       </Card>
     </div>
