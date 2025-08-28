@@ -3,7 +3,7 @@ import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyQ32onlpmDZLazMuW48RkqsLK0h9hg144",
+  apiKey: "AIzaSyDP_g6tVxB2v4n2bE_QzZ-4jScsYj4-1qE",
   authDomain: "etsy-6a694.firebaseapp.com",
   projectId: "etsy-6a694",
   storageBucket: "etsy-6a694.appspot.com",
