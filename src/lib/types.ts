@@ -1,3 +1,4 @@
+
 export interface EtsyShop {
   shop_id: number;
   shop_name: string;
@@ -43,3 +44,13 @@ export type FilterState = {
   age: number;
   views: number;
 };
+
+export interface KeywordSearchData {
+  stats: {
+    search_volume: number;
+    competition: number;
+    conversion_rate: number;
+    score: number;
+  };
+  listings: EtsyListing[];
+}

@@ -1,13 +1,18 @@
+
 'use server';
 
 import { z } from 'zod';
-import type { EtsyApiResponse, EtsyData, EtsyListing, EtsyShop } from '@/lib/types';
+import type { EtsyApiResponse, EtsyData, EtsyListing, EtsyShop, KeywordSearchData } from '@/lib/types';
 
 const FormSchema = z.object({
   storeName: z.string().min(1, 'Store name is required'),
   favorites: z.coerce.number().min(0),
   age: z.coerce.number().min(0),
   views: z.coerce.number().min(0),
+});
+
+const KeywordSchema = z.object({
+  keyword: z.string().min(1, 'Keyword is required'),
 });
 
 async function fetchFromEtsy<T>(url: string): Promise<T> {
@@ -72,6 +77,51 @@ export async function getEtsyInsights(
       },
       error: null,
     };
+  } catch (error) {
+    console.error(error);
+    const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred.';
+    return { data: null, error: errorMessage };
+  }
+}
+
+export async function getKeywordData(
+  prevState: any,
+  formData: FormData
+): Promise<{ data: KeywordSearchData | null; error: string | null }> {
+  try {
+    const validatedFields = KeywordSchema.safeParse({
+      keyword: formData.get('keyword'),
+    });
+
+    if (!validatedFields.success) {
+      return { data: null, error: 'Invalid form data.' };
+    }
+
+    const { keyword } = validatedFields.data;
+
+    // Since there is no direct Etsy API for keyword stats, we will simulate it.
+    // We will fetch active listings to get the competition.
+    const listingsUrl = `https://api.etsy.com/v3/application/listings/active?keywords=${encodeURIComponent(keyword)}&limit=25&includes=images`;
+    const listingsData = await fetchFromEtsy<EtsyApiResponse<EtsyListing>>(listingsUrl);
+    const listings = listingsData.results || [];
+    const competition = listingsData.count || 0;
+
+    // We will generate placeholder data for the other stats.
+    const simulatedStats = {
+      search_volume: Math.floor(Math.random() * 100000),
+      competition: competition,
+      conversion_rate: Math.random() * 0.1,
+      score: Math.floor(Math.random() * 100),
+    };
+
+    return {
+      data: {
+        stats: simulatedStats,
+        listings: listings,
+      },
+      error: null,
+    };
+
   } catch (error) {
     console.error(error);
     const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred.';
