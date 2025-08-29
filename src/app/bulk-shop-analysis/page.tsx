@@ -1,13 +1,7 @@
 'use client';
 
-import React from 'react';
-import { BulkShopsAnalysis } from '@/components/etsy/bulk-shops-analysis';
+import { BulkShopAnalysis } from '@/components/etsy/bulk-shop-analysis';
 
 export default function BulkShopAnalysisPage() {
-  return (
-    <div>
-      <h1 className="text-2xl font-semibold mb-4">Bulk Shop Analysis</h1>
-      <BulkShopsAnalysis />
-    </div>
-  );
+  return <BulkShopAnalysis />;
 }
