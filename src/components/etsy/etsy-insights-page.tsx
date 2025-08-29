@@ -7,6 +7,9 @@ import { ShopDetails } from './shop-details';
 import { ListingsTable } from './listings-table';
 import { BulkShopsAnalysis } from './bulk-shops-analysis';
 import { ProductTimelineChart } from './product-timeline-chart';
+import { Button } from '@/components/ui/button';
+import { auth } from '@/lib/firebase';
+import { signOut } from 'firebase/auth';
 
 import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
@@ -14,6 +17,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import type { EtsyData, FilterState } from '@/lib/types';
 import { AlertCircle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { useRouter } from 'next/navigation';
 
 const initialState = {
   data: null,
@@ -25,6 +29,7 @@ export default function EtsyInsightsPage() {
   const [state, formAction] = useActionState(getEtsyInsights, initialState);
   const [filters, setFilters] = useState<FilterState>({ favorites: 5, age: 30, views: 5 });
   const { toast } = useToast();
+  const router = useRouter();
 
   React.useEffect(() => {
     if (state.error) {
@@ -45,11 +50,34 @@ export default function EtsyInsightsPage() {
   const onFilterChange = useCallback((newFilters: FilterState) => {
     setFilters(newFilters);
   }, []);
+
+  const handleLogout = useCallback(async () => {
+    try {
+      await signOut(auth);
+      toast({
+        title: "Logged Out",
+        description: "You have been successfully logged out.",
+      });
+      router.push('/auth');
+    } catch (error) {
+      console.error("Error signing out: ", error);
+      toast({
+        variant: 'destructive',
+        title: 'Logout Failed',
+        description: 'There was an error while trying to log you out.',
+      });
+    }
+  }, [toast, router]);
   
   const etsyData = state.data as EtsyData | null;
 
   return (
     <div className="space-y-8">
+      <div className="flex justify-between items-center">
+        <h1 className="text-2xl font-semibold">Etsy Insights</h1>
+        <Button variant="outline" onClick={handleLogout}>Logout</Button>
+      </div>
+
       <Tabs defaultValue="single" className="w-full">
         <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="single">Single Shop Analysis</TabsTrigger>
