@@ -1,3 +1,5 @@
+'use client';
+
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { Search } from 'lucide-react';
 import { Sidebar, SidebarMenu, SidebarMenuItem, SidebarMenuButton } from '@/components/ui/sidebar';
