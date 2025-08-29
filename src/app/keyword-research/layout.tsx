@@ -1,6 +1,6 @@
 'use client';
 
-import { SidebarProvider, Sidebar, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarHeader, SidebarContent, SidebarTrigger } from "@/components/ui/sidebar";
+import { SidebarProvider, Sidebar, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarHeader, SidebarContent, SidebarTrigger, SidebarTitle } from "@/components/ui/sidebar";
 import { Search } from 'lucide-react';
 
 export default function KeywordResearchLayout({
@@ -11,9 +11,10 @@ export default function KeywordResearchLayout({
   return (
     <SidebarProvider>
       <div className="flex min-h-screen">
-        <Sidebar>
+        <Sidebar className="border-r" collapsible={false}>
           <SidebarContent>
             <SidebarHeader>
+              <SidebarTitle>Etsy Insights</SidebarTitle>
               <SidebarTrigger />
             </SidebarHeader>
             <SidebarMenu>
