@@ -49,11 +49,14 @@ export function ListingAnalyzer() {
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Listing Analyzer</CardTitle>
-      </CardHeader>
-      <CardContent>
+    <div className="space-y-8">
+        <div>
+            <h1 className="text-3xl font-bold">Listing Analyzer</h1>
+            <p className="text-muted-foreground">
+                Enter an Etsy listing ID to see its performance statistics.
+            </p>
+        </div>
+
         <div className="flex w-full max-w-sm items-center space-x-2">
           <Input
             type="text"
@@ -65,21 +68,23 @@ export function ListingAnalyzer() {
             {isLoading ? 'Searching...' : 'Search'}
           </Button>
         </div>
+
         {listing && (
-          <div className="mt-4 space-y-4">
-            <div>
-                <h3 className="text-xl font-semibold">{listing.title}</h3>
-                <p className="text-muted-foreground">{listing.description}</p>
-            </div>
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-                <StatCard title="Price" value={formatPrice(listing.price)} icon={<DollarSign className="h-4 w-4 text-muted-foreground" />} />
-                <StatCard title="Views" value={listing.views} icon={<Eye className="h-4 w-4 text-muted-foreground" />} />
-                <StatCard title="Favorites" value={listing.num_favorers} icon={<Heart className="h-4 w-4 text-muted-foreground" />} />
-                <StatCard title="Creation Date" value={formatDate(listing.creation_timestamp)} icon={<Calendar className="h-4 w-4 text-muted-foreground" />} />
-            </div>
-          </div>
+          <Card>
+            <CardHeader>
+              <CardTitle>{listing.title}</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <p className="text-muted-foreground">{listing.description}</p>
+              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+                  <StatCard title="Price" value={formatPrice(listing.price)} icon={<DollarSign className="h-4 w-4 text-muted-foreground" />} />
+                  <StatCard title="Views" value={listing.views} icon={<Eye className="h-4 w-4 text-muted-foreground" />} />
+                  <StatCard title="Favorites" value={listing.num_favorers} icon={<Heart className="h-4 w-4 text-muted-foreground" />} />
+                  <StatCard title="Creation Date" value={formatDate(listing.creation_timestamp)} icon={<Calendar className="h-4 w-4 text-muted-foreground" />} />
+              </div>
+            </CardContent>
+          </Card>
         )}
-      </CardContent>
-    </Card>
+    </div>
   );
 }

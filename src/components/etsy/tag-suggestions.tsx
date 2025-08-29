@@ -42,11 +42,14 @@ export function TagSuggestions() {
   };
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Tag Suggestions</CardTitle>
-      </CardHeader>
-      <CardContent>
+    <div className="space-y-8">
+        <div>
+            <h1 className="text-3xl font-bold">Tag Suggestions</h1>
+            <p className="text-muted-foreground">
+                Enter a keyword to get a list of suggested tags for your Etsy listings.
+            </p>
+        </div>
+
         <div className="flex w-full max-w-sm items-center space-x-2">
           <Input
             type="text"
@@ -58,24 +61,28 @@ export function TagSuggestions() {
             {isLoading ? 'Searching...' : 'Search'}
           </Button>
         </div>
+
         {tags.length > 0 && (
-          <div className="mt-4">
-            <h3 className="text-lg font-semibold">Suggested Tags</h3>
-            <div className="flex flex-wrap gap-2 mt-2">
-              {tags.map((tag, index) => (
-                <Badge
-                  key={index}
-                  variant="secondary"
-                  className="cursor-pointer"
-                  onClick={() => copyToClipboard(tag)}
-                >
-                  {tag}
-                </Badge>
-              ))}
-            </div>
-          </div>
+            <Card>
+                <CardHeader>
+                    <CardTitle>Suggested Tags</CardTitle>
+                </CardHeader>
+                <CardContent>
+                    <div className="flex flex-wrap gap-2 mt-2">
+                    {tags.map((tag, index) => (
+                        <Badge
+                        key={index}
+                        variant="secondary"
+                        className="cursor-pointer"
+                        onClick={() => copyToClipboard(tag)}
+                        >
+                        {tag}
+                        </Badge>
+                    ))}
+                    </div>
+                </CardContent>
+            </Card>
         )}
-      </CardContent>
-    </Card>
+    </div>
   );
 }

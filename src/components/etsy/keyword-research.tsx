@@ -39,11 +39,14 @@ export function KeywordResearch() {
   };
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Keyword Research</CardTitle>
-      </CardHeader>
-      <CardContent>
+    <div className="space-y-8">
+        <div>
+            <h1 className="text-3xl font-bold">Keyword Research</h1>
+            <p className="text-muted-foreground">
+                Enter a keyword to see its performance metrics and top tags on Etsy.
+            </p>
+        </div>
+
         <div className="flex w-full max-w-sm items-center space-x-2">
           <Input
             type="text"
@@ -55,16 +58,20 @@ export function KeywordResearch() {
             {isLoading ? 'Searching...' : 'Search'}
           </Button>
         </div>
+
         {results && (
-          <div className="mt-4 space-y-4">
+          <div className="space-y-8">
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
                 <StatCard title="Listings" value={results.num_listings} icon={<ShoppingBag className="h-4 w-4 text-muted-foreground" />} />
                 <StatCard title="Average Price" value={`$${results.average_price.toFixed(2)}`} icon={<BarChart className="h-4 w-4 text-muted-foreground" />} />
                 <StatCard title="Average Views" value={results.average_views} icon={<Eye className="h-4 w-4 text-muted-foreground" />} />
                 <StatCard title="Average Favorites" value={results.average_favorites} icon={<Heart className="h-4 w-4 text-muted-foreground" />} />
             </div>
-            <div>
-              <h3 className="text-lg font-semibold">Top Tags</h3>
+            <Card>
+              <CardHeader>
+                <CardTitle>Top Tags</CardTitle>
+              </CardHeader>
+              <CardContent>
                 <Table>
                     <TableHeader>
                         <TableRow>
@@ -81,10 +88,10 @@ export function KeywordResearch() {
                         ))}
                     </TableBody>
                 </Table>
-            </div>
+              </CardContent>
+            </Card>
           </div>
         )}
-      </CardContent>
-    </Card>
+    </div>
   );
 }
