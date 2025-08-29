@@ -1,10 +1,34 @@
+'use client';
+
+import React, { useState, useEffect } from 'react';
 import EtsyInsightsPage from '@/components/etsy/etsy-insights-page';
-import { PasswordProtection } from '@/components/password-protection';
+import { Auth } from '@/components/auth';
 import { Store } from 'lucide-react';
+import { auth } from '@/lib/firebase';
+import { onAuthStateChanged, User } from 'firebase/auth';
 
 export default function Home() {
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      setUser(user);
+      setLoading(false);
+    });
+    return () => unsubscribe();
+  }, []);
+
+  if (loading) {
+    return <div>Loading...</div>; // Or a proper loading spinner
+  }
+
+  if (!user) {
+    return <Auth onAuthSuccess={() => {}} />;
+  }
+
   return (
-    <PasswordProtection>
+    <>
       <main className="min-h-screen bg-background">
         <div className="container mx-auto px-4 py-8">
           <header className="text-center mb-8 no-print">
@@ -18,16 +42,15 @@ export default function Home() {
               Analyze individual Etsy stores or bulk analyze multiple shops. Get shop insights, sales data, and copy results to Google Sheets.
             </p>
           </header>
-          
+
           <div className="printable-area">
             <EtsyInsightsPage />
           </div>
-
         </div>
       </main>
       <footer className="py-6 text-center text-sm text-muted-foreground no-print">
         Etsy Insights © {new Date().getFullYear()}
       </footer>
-    </PasswordProtection>
+    </>
   );
 }
