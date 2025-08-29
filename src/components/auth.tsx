@@ -18,8 +18,28 @@ import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   sendPasswordResetEmail,
+  fetchSignInMethodsForEmail,
 } from 'firebase/auth';
 import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogTrigger,
+  DialogFooter
+} from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
+
 
 interface AuthProps {
   onAuthSuccess: () => void;
@@ -32,6 +52,11 @@ export function Auth({ onAuthSuccess }: AuthProps) {
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
   const [loading, setLoading] = useState(false);
+  const [resetEmail, setResetEmail] = useState("");
+  const [isForgotPasswordOpen, setIsForgotPasswordOpen] = useState(false);
+  const [isAlertOpen, setIsAlertOpen] = useState(false);
+  const [alertMessage, setAlertMessage] = useState({ title: "", description: "" });
+
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -88,27 +113,38 @@ export function Auth({ onAuthSuccess }: AuthProps) {
   };
 
   const handlePasswordReset = async () => {
-    if (!loginEmail) {
-      toast({
-        variant: 'destructive',
-        title: 'Email Required',
-        description: 'Please enter your email address to reset your password.',
+    if (!resetEmail) {
+      setAlertMessage({
+        title: "Email Required",
+        description: "Please enter your email address to reset your password.",
       });
+      setIsAlertOpen(true);
       return;
     }
     setLoading(true);
     try {
-      await sendPasswordResetEmail(auth, loginEmail);
-      toast({
-        title: 'Password Reset Email Sent',
-        description: 'Check your inbox for a link to reset your password.',
+      const methods = await fetchSignInMethodsForEmail(auth, resetEmail);
+      if (methods.length === 0) {
+        setAlertMessage({
+          title: "Email Not Registered",
+          description: "The email you entered is not registered.",
+        });
+        setIsAlertOpen(true);
+        return;
+      }
+      await sendPasswordResetEmail(auth, resetEmail);
+      setAlertMessage({
+        title: "Password Reset Email Sent",
+        description: "Check your inbox for a link to reset your password.",
       });
+      setIsAlertOpen(true);
+      setIsForgotPasswordOpen(false);
     } catch (error: any) {
-      toast({
-        variant: 'destructive',
-        title: 'Password Reset Failed',
+      setAlertMessage({
+        title: "Password Reset Failed",
         description: error.message,
       });
+      setIsAlertOpen(true);
     } finally {
       setLoading(false);
     }
@@ -155,15 +191,42 @@ export function Auth({ onAuthSuccess }: AuthProps) {
                 <Button type="submit" className="w-full" disabled={loading}>
                   {loading ? 'Logging in...' : 'Login'}
                 </Button>
-                <Button
-                  type="button"
-                  variant="link"
-                  className="w-full"
-                  onClick={handlePasswordReset}
-                  disabled={loading}
-                >
-                  Forgot Password?
-                </Button>
+                <Dialog open={isForgotPasswordOpen} onOpenChange={setIsForgotPasswordOpen}>
+                  <DialogTrigger asChild>
+                    <Button
+                      type="button"
+                      variant="link"
+                      className="w-full"
+                      disabled={loading}
+                    >
+                      Forgot Password?
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Forgot Password</DialogTitle>
+                      <DialogDescription>
+                        Enter your email address and we will send you a link to reset your password.
+                      </DialogDescription>
+                    </DialogHeader>
+                    <div className="space-y-2">
+                      <Label htmlFor="reset-email">Email</Label>
+                      <Input
+                        id="reset-email"
+                        type="email"
+                        placeholder="m@example.com"
+                        value={resetEmail}
+                        onChange={(e) => setResetEmail(e.target.value)}
+                        required
+                      />
+                    </div>
+                    <DialogFooter>
+                      <Button onClick={handlePasswordReset} disabled={loading}>
+                        {loading ? 'Sending...' : 'Send Reset Link'}
+                      </Button>
+                    </DialogFooter>
+                  </DialogContent>
+                </Dialog>
               </form>
             </CardContent>
           </Card>
@@ -218,6 +281,19 @@ export function Auth({ onAuthSuccess }: AuthProps) {
           </Card>
         </TabsContent>
       </Tabs>
+      <AlertDialog open={isAlertOpen} onOpenChange={setIsAlertOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{alertMessage.title}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {alertMessage.description}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogAction onClick={() => setIsAlertOpen(false)}>OK</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

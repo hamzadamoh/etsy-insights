@@ -1,4 +1,2 @@
-# Environment variables
-.env.local
-serviceAccountKey.json
+src/lib/firebase.ts
 node_modules
