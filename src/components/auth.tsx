@@ -27,7 +27,8 @@ interface AuthProps {
 
 export function Auth({ onAuthSuccess }: AuthProps) {
   const { toast } = useToast();
-  const [email, setEmail] = useState('');
+  const [loginEmail, setLoginEmail] = useState('');
+  const [signupEmail, setSignupEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
   const [loading, setLoading] = useState(false);
@@ -36,7 +37,7 @@ export function Auth({ onAuthSuccess }: AuthProps) {
     e.preventDefault();
     setLoading(true);
     try {
-      await signInWithEmailAndPassword(auth, email, password);
+      await signInWithEmailAndPassword(auth, loginEmail, password);
       toast({
         title: 'Login Successful',
         description: "Welcome back!",
@@ -59,13 +60,13 @@ export function Auth({ onAuthSuccess }: AuthProps) {
     try {
       const userCredential = await createUserWithEmailAndPassword(
         auth,
-        email,
+        signupEmail,
         password
       );
       const user = userCredential.user;
       await setDoc(doc(db, 'users', user.uid), {
         name,
-        email,
+        email: signupEmail,
         role: 'user',
         status: 'active',
         createdAt: serverTimestamp(),
@@ -87,8 +88,7 @@ export function Auth({ onAuthSuccess }: AuthProps) {
   };
 
   const handlePasswordReset = async () => {
-    console.log('handlePasswordReset called');
-    if (!email) {
+    if (!loginEmail) {
       toast({
         variant: 'destructive',
         title: 'Email Required',
@@ -98,7 +98,7 @@ export function Auth({ onAuthSuccess }: AuthProps) {
     }
     setLoading(true);
     try {
-      await sendPasswordResetEmail(auth, email);
+      await sendPasswordResetEmail(auth, loginEmail);
       toast({
         title: 'Password Reset Email Sent',
         description: 'Check your inbox for a link to reset your password.',
@@ -137,8 +137,8 @@ export function Auth({ onAuthSuccess }: AuthProps) {
                     id="login-email"
                     type="email"
                     placeholder="m@example.com"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    value={loginEmail}
+                    onChange={(e) => setLoginEmail(e.target.value)}
                     required
                   />
                 </div>
@@ -195,8 +195,8 @@ export function Auth({ onAuthSuccess }: AuthProps) {
                     id="signup-email"
                     type="email"
                     placeholder="m@example.com"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    value={signupEmail}
+                    onChange={(e) => setSignupEmail(e.target.value)}
                     required
                   />
                 </div>
