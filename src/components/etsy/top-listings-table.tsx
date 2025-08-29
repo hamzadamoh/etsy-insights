@@ -1,4 +1,3 @@
-push to gi
 import type { EtsyListing } from "@/lib/types";
 
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
