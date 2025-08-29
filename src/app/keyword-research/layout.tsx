@@ -11,7 +11,7 @@ export default function KeywordResearchLayout({
   return (
     <SidebarProvider>
       <div className="flex min-h-screen">
-        <Sidebar className="border-r" collapsible={false}>
+        <Sidebar className="border-r" collapsible="offcanvas">
           <SidebarContent>
             <SidebarHeader>
               <div className="font-semibold text-lg">Etsy Insights</div>
