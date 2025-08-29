@@ -87,6 +87,7 @@ export function Auth({ onAuthSuccess }: AuthProps) {
   };
 
   const handlePasswordReset = async () => {
+    console.log('handlePasswordReset called');
     if (!email) {
       toast({
         variant: 'destructive',
