@@ -2,7 +2,7 @@ import type {Metadata} from 'next';
 import { Inter } from 'next/font/google'
 import './globals.css';
 import { ToastProvider } from "@/components/ui/toast"
-import { SidebarProvider } from '@/lib/contexts/sidebar-context';
+import { SidebarProvider } from '@/components/ui/sidebar';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' })
 
