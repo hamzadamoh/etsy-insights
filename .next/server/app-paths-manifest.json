@@ -1,1 +1,16 @@
-{}
+{
+  "/_not-found/page": "app/_not-found/page.js",
+  "/api/etsy/keyword-research/route": "app/api/etsy/keyword-research/route.js",
+  "/api/etsy/listing/route": "app/api/etsy/listing/route.js",
+  "/api/etsy/shop/route": "app/api/etsy/shop/route.js",
+  "/api/etsy/tags/route": "app/api/etsy/tags/route.js",
+  "/favicon.ico/route": "app/favicon.ico/route.js",
+  "/auth/page": "app/auth/page.js",
+  "/bulk-shop-analysis/page": "app/bulk-shop-analysis/page.js",
+  "/competitor-tracker/page": "app/competitor-tracker/page.js",
+  "/keyword-research/page": "app/keyword-research/page.js",
+  "/listing-analyzer/page": "app/listing-analyzer/page.js",
+  "/page": "app/page.js",
+  "/shop-analyzer/page": "app/shop-analyzer/page.js",
+  "/tag-suggestions/page": "app/tag-suggestions/page.js"
+}

@@ -28,10 +28,52 @@
       "namedRegex": "^/_not\\-found(?:/)?$"
     },
     {
+      "page": "/auth",
+      "regex": "^/auth(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/auth(?:/)?$"
+    },
+    {
+      "page": "/bulk-shop-analysis",
+      "regex": "^/bulk\\-shop\\-analysis(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/bulk\\-shop\\-analysis(?:/)?$"
+    },
+    {
+      "page": "/competitor-tracker",
+      "regex": "^/competitor\\-tracker(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/competitor\\-tracker(?:/)?$"
+    },
+    {
       "page": "/favicon.ico",
       "regex": "^/favicon\\.ico(?:/)?$",
       "routeKeys": {},
       "namedRegex": "^/favicon\\.ico(?:/)?$"
+    },
+    {
+      "page": "/keyword-research",
+      "regex": "^/keyword\\-research(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/keyword\\-research(?:/)?$"
+    },
+    {
+      "page": "/listing-analyzer",
+      "regex": "^/listing\\-analyzer(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/listing\\-analyzer(?:/)?$"
+    },
+    {
+      "page": "/shop-analyzer",
+      "regex": "^/shop\\-analyzer(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/shop\\-analyzer(?:/)?$"
+    },
+    {
+      "page": "/tag-suggestions",
+      "regex": "^/tag\\-suggestions(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/tag\\-suggestions(?:/)?$"
     }
   ],
   "dataRoutes": [],

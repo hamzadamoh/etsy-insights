@@ -20,7 +20,7 @@ interface BulkShopData {
   error?: string;
 }
 
-export function BulkShopsAnalysis() {
+export function BulkShopAnalysis() {
   const { showToast } = useToast();
   const [shopNames, setShopNames] = useState('');
   const [shopsData, setShopsData] = useState<BulkShopData[]>([]);

@@ -1,3 +1,128 @@
 {
-  "pages": {}
+  "pages": {
+    "/_not-found/page": [
+      "static/chunks/webpack-693c99c7890a789b.js",
+      "static/chunks/4bd1b696-965df664d340569c.js",
+      "static/chunks/684-4157f01215e5a76a.js",
+      "static/chunks/main-app-23eeda2f082783e6.js",
+      "static/chunks/app/_not-found/page-b63df5a8d3225455.js"
+    ],
+    "/layout": [
+      "static/chunks/webpack-693c99c7890a789b.js",
+      "static/chunks/4bd1b696-965df664d340569c.js",
+      "static/chunks/684-4157f01215e5a76a.js",
+      "static/chunks/main-app-23eeda2f082783e6.js",
+      "static/css/6049f22b894643cf.css",
+      "static/chunks/352-9e82cb96c45b8d18.js",
+      "static/chunks/443-9c8b836efe272bcf.js",
+      "static/chunks/298-cb780a07323f3330.js",
+      "static/chunks/167-5136f576c0c54213.js",
+      "static/chunks/app/layout-98c0dbf1022065f4.js"
+    ],
+    "/api/etsy/keyword-research/route": [
+      "static/chunks/webpack-693c99c7890a789b.js",
+      "static/chunks/4bd1b696-965df664d340569c.js",
+      "static/chunks/684-4157f01215e5a76a.js",
+      "static/chunks/main-app-23eeda2f082783e6.js",
+      "static/chunks/app/api/etsy/keyword-research/route-f4a6d7944cf544ae.js"
+    ],
+    "/api/etsy/listing/route": [
+      "static/chunks/webpack-693c99c7890a789b.js",
+      "static/chunks/4bd1b696-965df664d340569c.js",
+      "static/chunks/684-4157f01215e5a76a.js",
+      "static/chunks/main-app-23eeda2f082783e6.js",
+      "static/chunks/app/api/etsy/listing/route-9542d16891b51756.js"
+    ],
+    "/api/etsy/shop/route": [
+      "static/chunks/webpack-693c99c7890a789b.js",
+      "static/chunks/4bd1b696-965df664d340569c.js",
+      "static/chunks/684-4157f01215e5a76a.js",
+      "static/chunks/main-app-23eeda2f082783e6.js",
+      "static/chunks/app/api/etsy/shop/route-6b52b142007f6358.js"
+    ],
+    "/api/etsy/tags/route": [
+      "static/chunks/webpack-693c99c7890a789b.js",
+      "static/chunks/4bd1b696-965df664d340569c.js",
+      "static/chunks/684-4157f01215e5a76a.js",
+      "static/chunks/main-app-23eeda2f082783e6.js",
+      "static/chunks/app/api/etsy/tags/route-ca1d02ec9cdd8a2d.js"
+    ],
+    "/auth/page": [
+      "static/chunks/webpack-693c99c7890a789b.js",
+      "static/chunks/4bd1b696-965df664d340569c.js",
+      "static/chunks/684-4157f01215e5a76a.js",
+      "static/chunks/main-app-23eeda2f082783e6.js",
+      "static/chunks/bc9e92e6-55753bf3e38f3b70.js",
+      "static/chunks/7c86ec74-929f40c1aaed3649.js",
+      "static/chunks/352-9e82cb96c45b8d18.js",
+      "static/chunks/443-9c8b836efe272bcf.js",
+      "static/chunks/330-f6070480ebd40ff0.js",
+      "static/chunks/478-a126a32eb9a82177.js",
+      "static/chunks/app/auth/page-1d248b3b892c30df.js"
+    ],
+    "/bulk-shop-analysis/page": [
+      "static/chunks/webpack-693c99c7890a789b.js",
+      "static/chunks/4bd1b696-965df664d340569c.js",
+      "static/chunks/684-4157f01215e5a76a.js",
+      "static/chunks/main-app-23eeda2f082783e6.js",
+      "static/chunks/352-9e82cb96c45b8d18.js",
+      "static/chunks/app/bulk-shop-analysis/page-1b9ac74c7995837d.js"
+    ],
+    "/competitor-tracker/page": [
+      "static/chunks/webpack-693c99c7890a789b.js",
+      "static/chunks/4bd1b696-965df664d340569c.js",
+      "static/chunks/684-4157f01215e5a76a.js",
+      "static/chunks/main-app-23eeda2f082783e6.js",
+      "static/chunks/352-9e82cb96c45b8d18.js",
+      "static/chunks/app/competitor-tracker/page-a2d6fb447466f789.js"
+    ],
+    "/keyword-research/page": [
+      "static/chunks/webpack-693c99c7890a789b.js",
+      "static/chunks/4bd1b696-965df664d340569c.js",
+      "static/chunks/684-4157f01215e5a76a.js",
+      "static/chunks/main-app-23eeda2f082783e6.js",
+      "static/chunks/352-9e82cb96c45b8d18.js",
+      "static/chunks/app/keyword-research/page-c095b4a09cb2fbaf.js"
+    ],
+    "/listing-analyzer/page": [
+      "static/chunks/webpack-693c99c7890a789b.js",
+      "static/chunks/4bd1b696-965df664d340569c.js",
+      "static/chunks/684-4157f01215e5a76a.js",
+      "static/chunks/main-app-23eeda2f082783e6.js",
+      "static/chunks/352-9e82cb96c45b8d18.js",
+      "static/chunks/app/listing-analyzer/page-f9ca4b1b9c47f5e9.js"
+    ],
+    "/page": [
+      "static/chunks/webpack-693c99c7890a789b.js",
+      "static/chunks/4bd1b696-965df664d340569c.js",
+      "static/chunks/684-4157f01215e5a76a.js",
+      "static/chunks/main-app-23eeda2f082783e6.js",
+      "static/chunks/bc9e92e6-55753bf3e38f3b70.js",
+      "static/chunks/7c86ec74-929f40c1aaed3649.js",
+      "static/chunks/352-9e82cb96c45b8d18.js",
+      "static/chunks/443-9c8b836efe272bcf.js",
+      "static/chunks/330-f6070480ebd40ff0.js",
+      "static/chunks/298-cb780a07323f3330.js",
+      "static/chunks/415-748d53598d52d763.js",
+      "static/chunks/478-a126a32eb9a82177.js",
+      "static/chunks/app/page-1969757be6a1882c.js"
+    ],
+    "/shop-analyzer/page": [
+      "static/chunks/webpack-693c99c7890a789b.js",
+      "static/chunks/4bd1b696-965df664d340569c.js",
+      "static/chunks/684-4157f01215e5a76a.js",
+      "static/chunks/main-app-23eeda2f082783e6.js",
+      "static/chunks/352-9e82cb96c45b8d18.js",
+      "static/chunks/15-0e59c197dfbf8f0c.js",
+      "static/chunks/app/shop-analyzer/page-cbd33a40d228f7ae.js"
+    ],
+    "/tag-suggestions/page": [
+      "static/chunks/webpack-693c99c7890a789b.js",
+      "static/chunks/4bd1b696-965df664d340569c.js",
+      "static/chunks/684-4157f01215e5a76a.js",
+      "static/chunks/main-app-23eeda2f082783e6.js",
+      "static/chunks/352-9e82cb96c45b8d18.js",
+      "static/chunks/app/tag-suggestions/page-109e8e511a73876f.js"
+    ]
+  }
 }
