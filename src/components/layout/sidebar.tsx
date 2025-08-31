@@ -8,24 +8,26 @@ import { Home, Search, ShoppingCart, Tag, Users, List } from 'lucide-react';
 
 export function Sidebar() {
     const pathname = usePathname();
+    console.log('Current pathname:', pathname);
 
   return (
     <div className="hidden border-r bg-muted/40 md:block">
       <div className="flex h-full max-h-screen flex-col gap-2">
         <div className="flex h-14 items-center border-b px-4 lg:h-[60px] lg:px-6">
-          <a href="/" className="flex items-center gap-2 font-semibold">
+          <Link href="/" className="flex items-center gap-2 font-semibold">
             <ShoppingCart className="h-6 w-6" />
             <span className="">Etsy Insights</span>
-          </a>
+          </Link>
         </div>
         <div className="flex-1">
           <nav className="grid items-start px-2 text-sm font-medium lg:px-4">
-            <Link href="/">
+            <Link href="/" className="w-full block">
               <Button
                 variant={pathname === '/' ? 'secondary' : 'ghost'}
                 className="w-full justify-start"
+                onClick={() => console.log('Dashboard button clicked')}
               >
-                <Home className="h-4 w-4" />
+                <Home className="h-4 w-4 mr-2" />
                 Dashboard
               </Button>
             </Link>

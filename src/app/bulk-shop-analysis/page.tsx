@@ -1,7 +1,7 @@
 'use client';
 
-import { BulkShopAnalysis } from '@/components/etsy/bulk-shops-analysis';
+import { BulkShopsAnalysis } from '@/components/etsy/bulk-shops-analysis';
 
 export default function BulkShopAnalysisPage() {
-  return <BulkShopAnalysis />;
+  return <BulkShopsAnalysis />;
 }
