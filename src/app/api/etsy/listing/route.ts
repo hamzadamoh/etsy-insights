@@ -2,26 +2,32 @@
 
 import {NextRequest, NextResponse} from "next/server";
 
-// Dummy function to simulate fetching a listing from Etsy API
+async function fetchFromEtsy<T>(url: string): Promise<T> {
+  const apiKey = process.env.ETSY_API_KEY;
+  if (!apiKey) {
+    throw new Error('Etsy API key is not configured.');
+  }
+
+  const response = await fetch(url, {
+    headers: {
+      'x-api-key': apiKey,
+    },
+    cache: 'no-store',
+  });
+
+  if (!response.ok) {
+    const errorBody = await response.text();
+    console.error(`Etsy API Error (${response.status}): ${errorBody}`);
+    throw new Error(`Failed to fetch data from Etsy. Status: ${response.status}`);
+  }
+
+  return response.json();
+}
+
 async function getListingFromEtsy(listingId: string) {
-    // In a real application, you would make a call to the Etsy API
-    // using something like: `https://api.etsy.com/v3/application/listings/${listingId}`
-    // with your API key in the headers.
-    console.log(`Fetching listing for ID: ${listingId}`);
-
-    // This is mock data that simulates the response from the Etsy API.
-    const mockData = {
-        listing_id: parseInt(listingId),
-        title: "Gorgeous handmade necklace",
-        description: "A beautiful, handcrafted necklace made with love. Perfect for any occasion.",
-        price: {amount: 2500, divisor: 100, currency_code: "USD"},
-        views: 1234,
-        num_favorers: 567,
-        creation_timestamp: 1672531200, // January 1, 2023
-        // You can add more fields as needed
-    };
-
-    return Promise.resolve(mockData);
+    const url = `https://api.etsy.com/v3/application/listings/${listingId}`;
+    const listingData = await fetchFromEtsy<any>(url);
+    return listingData;
 }
 
 export async function GET(request: NextRequest) {
@@ -37,6 +43,7 @@ export async function GET(request: NextRequest) {
         return NextResponse.json({listing});
     } catch (error) {
         console.error("Error fetching listing data:", error);
-        return NextResponse.json({error: "Failed to fetch listing data"}, {status: 500});
+        const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred.';
+        return NextResponse.json({error: errorMessage}, {status: 500});
     }
 }

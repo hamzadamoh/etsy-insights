@@ -2,29 +2,47 @@
 
 import {NextRequest, NextResponse} from "next/server";
 
-// Dummy function to simulate keyword research from Etsy API
+async function fetchFromEtsy<T>(url: string): Promise<T> {
+  const apiKey = process.env.ETSY_API_KEY;
+  if (!apiKey) {
+    throw new Error('Etsy API key is not configured.');
+  }
+
+  const response = await fetch(url, {
+    headers: {
+      'x-api-key': apiKey,
+    },
+    cache: 'no-store',
+  });
+
+  if (!response.ok) {
+    const errorBody = await response.text();
+    console.error(`Etsy API Error (${response.status}): ${errorBody}`);
+    throw new Error(`Failed to fetch data from Etsy. Status: ${response.status}`);
+  }
+
+  return response.json();
+}
+
 async function getKeywordResearchFromEtsy(keyword: string) {
-    // In a real application, this would involve multiple calls to the Etsy API
-    // to get listing data for a keyword, then perform aggregations.
-    console.log(`Performing keyword research for: ${keyword}`);
+    const url = `https://api.etsy.com/v3/application/listings/active?keywords=${encodeURIComponent(keyword)}&limit=10`;
+    const listingsData = await fetchFromEtsy<any>(url);
 
-    // This is mock data that simulates the results of the research.
-    const mockData = {
-        keyword: keyword,
-        num_listings: 1500,
-        average_price: 35.50,
-        average_views: 850,
-        average_favorites: 120,
-        top_tags: [
-            {tag: "handmade jewelry", count: 800},
-            {tag: "custom necklace", count: 650},
-            {tag: "gift for her", count: 500},
-            {tag: "minimalist jewelry", count: 450},
-            {tag: "gold necklace", count: 300},
-        ],
+    const listingsWithTags = await Promise.all(
+      listingsData.results.map(async (listing: any) => {
+        const tagsUrl = `https://api.etsy.com/v3/application/listings/${listing.listing_id}/tags`;
+        const tagsData = await fetchFromEtsy<any>(tagsUrl);
+        return {
+          ...listing,
+          tags: tagsData.results.map((tag: any) => tag.tag),
+        };
+      })
+    );
+
+    return {
+        ...listingsData,
+        results: listingsWithTags
     };
-
-    return Promise.resolve(mockData);
 }
 
 export async function GET(request: NextRequest) {
@@ -40,6 +58,7 @@ export async function GET(request: NextRequest) {
         return NextResponse.json(researchData);
     } catch (error) {
         console.error("Error performing keyword research:", error);
-        return NextResponse.json({error: "Failed to perform keyword research"}, {status: 500});
+        const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred.';
+        return NextResponse.json({error: errorMessage}, {status: 500});
     }
 }
