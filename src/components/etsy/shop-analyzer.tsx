@@ -5,15 +5,16 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Loader2, Store, Search } from 'lucide-react';
-import { useToast } from '@/components/ui/toast';
+import { useToast } from '@/hooks/use-toast';
 import { ShopDetails } from './shop-details';
 import { motion, AnimatePresence } from 'framer-motion';
-import type { EtsyShop, FilterState } from '@/lib/types';
+import type { EtsyShop, FilterState, Listing } from '@/lib/types';
 
 export function ShopAnalyzer() {
   const { toast } = useToast();
   const [shopName, setShopName] = useState('');
   const [shop, setShop] = useState<EtsyShop | null>(null);
+  const [listings, setListings] = useState<Listing[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [filters, setFilters] = useState<FilterState>({ age: 365, favorites: 100, views: 1000 });
 
@@ -29,6 +30,7 @@ export function ShopAnalyzer() {
 
     setIsLoading(true);
     setShop(null);
+    setListings([]);
 
     try {
       const response = await fetch('/api/etsy/shop', {
@@ -40,6 +42,7 @@ export function ShopAnalyzer() {
       if (response.ok) {
         const data = await response.json();
         setShop(data.shop);
+        setListings(data.listings);
       } else {
         const error = await response.json();
         throw new Error(error.error || 'Could not retrieve shop data.');
@@ -92,7 +95,7 @@ export function ShopAnalyzer() {
             >
               {isLoading ? (
                 <>
-                  <Loader2 className="h-5 w-5 animate-spin" />
+                  <Loader2 className_="h-5 w-5 animate-spin" />
                   <span>Analyzing...</span>
                 </>
               ) : (
@@ -114,7 +117,7 @@ export function ShopAnalyzer() {
             exit={{ opacity: 0, y: -50, scale: 0.9, rotateX: 30 }}
             transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
           >
-            <ShopDetails shop={shop} filters={filters} />
+            <ShopDetails shop={shop} filters={filters} listings={listings} />
           </motion.div>
         )}
       </AnimatePresence>

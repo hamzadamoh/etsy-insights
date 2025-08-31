@@ -2,17 +2,20 @@
 
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import type { EtsyShop, FilterState } from '@/lib/types';
+import type { EtsyShop, FilterState, Listing } from '@/lib/types';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Copy } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { useToast } from '@/hooks/use-toast';
+import { ListingsTable } from './listings-table';
+import { ProductTimelineChart } from './product-timeline-chart';
 
 
 interface ShopDetailsProps {
   shop: EtsyShop;
   filters: FilterState;
+  listings: Listing[];
 }
 
 const StatCard = ({ title, value, status }: { title: string; value: string | number; status?: 'good' | 'bad' }) => {
@@ -30,7 +33,7 @@ const StatCard = ({ title, value, status }: { title: string; value: string | num
     )
 };
 
-export function ShopDetails({ shop, filters }: ShopDetailsProps) {
+export function ShopDetails({ shop, filters, listings }: ShopDetailsProps) {
   const { toast } = useToast();
   const shopAgeInDays = Math.ceil((new Date().getTime() - new Date(shop.create_date * 1000).getTime()) / (1000 * 60 * 60 * 24));
 
@@ -184,6 +187,17 @@ export function ShopDetails({ shop, filters }: ShopDetailsProps) {
                 Views {'>='} <span className="font-semibold text-primary">{filters.views}</span>.
             </p>
         </div>
+
+        {/* Listings Table */}
+        <div className="mt-6">
+          <ListingsTable listings={listings} filters={filters} />
+        </div>
+
+        {/* Product Timeline Chart */}
+        <div className="mt-6">
+          <ProductTimelineChart listings={listings} />
+        </div>
+
       </CardContent>
     </Card>
   );
