@@ -18,7 +18,7 @@ import {
   Copy,
   CheckCircle,
 } from 'lucide-react';
-import { useToast } from '@/components/ui/toast';
+import { useToast } from '@/hooks/use-toast';
 import { db, auth } from '@/lib/firebase';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { collection, getDocs, doc, setDoc, updateDoc, deleteDoc, serverTimestamp } from 'firebase/firestore';

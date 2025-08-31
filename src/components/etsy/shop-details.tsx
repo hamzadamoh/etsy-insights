@@ -188,14 +188,14 @@ export function ShopDetails({ shop, filters, listings }: ShopDetailsProps) {
             </p>
         </div>
 
-        {/* Listings Table */}
-        <div className="mt-6">
-          <ListingsTable listings={listings} filters={filters} />
-        </div>
-
         {/* Product Timeline Chart */}
         <div className="mt-6">
           <ProductTimelineChart listings={listings} />
+        </div>
+
+        {/* Listings Table */}
+        <div className="mt-6">
+          <ListingsTable listings={listings} filters={filters} />
         </div>
 
       </CardContent>

@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Users, Plus, Trash2, Eye } from 'lucide-react';
-import { useToast } from '@/components/ui/toast';
+import { useToast } from '@/hooks/use-toast';
 
 interface Competitor {
   id: string;
@@ -21,14 +21,18 @@ interface Competitor {
 }
 
 export function CompetitorTracker() {
-  const { showToast } = useToast();
+  const { toast } = useToast();
   const [competitors, setCompetitors] = useState<Competitor[]>([]);
   const [newShopName, setNewShopName] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
   const addCompetitor = async () => {
     if (!newShopName.trim()) {
-      showToast("Please enter a shop name", "error");
+      toast({
+        title: "Shop name required",
+        description: "Please enter a shop name",
+        variant: 'destructive',
+      });
       return;
     }
 
@@ -57,12 +61,19 @@ export function CompetitorTracker() {
 
         setCompetitors(prev => [...prev, newCompetitor]);
         setNewShopName('');
-        showToast(`Added ${shop.shop_name} to competitor tracker`, "success");
+        toast({
+          title: "Competitor Added",
+          description: `Added ${shop.shop_name} to competitor tracker`,
+        });
       } else {
         throw new Error('Failed to fetch shop data');
       }
     } catch (error) {
-      showToast("Failed to add competitor", "error");
+        toast({
+          title: "Failed to add competitor",
+          description: "An error occurred while adding the competitor",
+          variant: 'destructive',
+        });
     } finally {
       setIsLoading(false);
     }
@@ -70,7 +81,10 @@ export function CompetitorTracker() {
 
   const removeCompetitor = (id: string) => {
     setCompetitors(prev => prev.filter(comp => comp.id !== id));
-    showToast("Competitor removed", "success");
+    toast({
+      title: "Competitor Removed",
+      description: "Competitor has been removed from the tracker",
+    });
   };
 
   const updateCompetitor = async (competitor: Competitor) => {
@@ -97,10 +111,17 @@ export function CompetitorTracker() {
             lastChecked: new Date()
           } : comp
         ));
-        showToast(`Updated ${competitor.shopName}`, "success");
+        toast({
+          title: "Competitor Updated",
+          description: `Updated ${competitor.shopName}`,
+        });
       }
     } catch (error) {
-      showToast("Failed to update competitor", "error");
+      toast({
+        title: "Failed to update competitor",
+        description: "An error occurred while updating the competitor",
+        variant: 'destructive',
+      });
     } finally {
       setIsLoading(false);
     }

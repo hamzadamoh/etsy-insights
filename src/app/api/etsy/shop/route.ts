@@ -54,7 +54,14 @@ export async function POST(request: NextRequest) {
 
     const shop = shopData.results[0];
 
-    return NextResponse.json({ shop });
+    // Get shop listings
+    const listingsUrl = `https://api.etsy.com/v3/application/shops/${shop.shop_id}/listings/active`;
+    const listingsData = await fetchFromEtsy<any>(listingsUrl);
+
+    return NextResponse.json({ 
+      shop, 
+      listings: listingsData.results || [] 
+    });
   } catch (error) {
     console.error(error);
     const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred.';

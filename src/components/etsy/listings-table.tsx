@@ -17,7 +17,7 @@ import type { EtsyListing, FilterState } from '@/lib/types';
 import { Heart, Eye, Calendar, Tag, ExternalLink, Package, Zap, ArrowUpDown, ArrowUp, ArrowDown, Download } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import Image from 'next/image';
-import { useToast } from '@/components/ui/toast';
+import { useToast } from '@/hooks/use-toast';
 
 interface ListingsTableProps {
   listings: EtsyListing[];
@@ -36,7 +36,7 @@ const HighlightCell = ({ children, isGood }: { children: React.ReactNode, isGood
 );
 
 export function ListingsTable({ listings, filters }: ListingsTableProps) {
-  const { showToast } = useToast();
+  const { toast } = useToast();
   const [sortField, setSortField] = useState<SortField>('favorites');
   const [sortDirection, setSortDirection] = useState<SortDirection>('desc');
 
@@ -99,7 +99,11 @@ export function ListingsTable({ listings, filters }: ListingsTableProps) {
 
   const downloadCSV = (includeAllData: boolean = false) => {
     if (!listings || listings.length === 0) {
-      showToast("No data to download. Please analyze a shop first.", "error");
+      toast({
+        title: "No data to download",
+        description: "Please analyze a shop first.",
+        variant: 'destructive',
+      });
       return;
     }
 
@@ -166,9 +170,16 @@ export function ListingsTable({ listings, filters }: ListingsTableProps) {
       link.click();
       document.body.removeChild(link);
 
-      showToast(`Download Complete! CSV file with ${listings.length} listings has been downloaded.`, "success");
+      toast({
+        title: "Download Complete!",
+        description: `CSV file with ${listings.length} listings has been downloaded.`,
+      });
     } catch (error) {
-      showToast("Download Failed. Failed to create CSV file.", "error");
+      toast({
+        title: "Download Failed",
+        description: "Failed to create CSV file.",
+        variant: 'destructive',
+      });
     }
   };
 
