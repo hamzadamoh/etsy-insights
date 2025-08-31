@@ -8,17 +8,22 @@ import { Loader2, Store, Search } from 'lucide-react';
 import { useToast } from '@/components/ui/toast';
 import { ShopDetails } from './shop-details';
 import { motion, AnimatePresence } from 'framer-motion';
-import type { EtsyShop } from '@/lib/types';
+import type { EtsyShop, FilterState } from '@/lib/types';
 
 export function ShopAnalyzer() {
-  const { showToast } = useToast();
+  const { toast } = useToast();
   const [shopName, setShopName] = useState('');
   const [shop, setShop] = useState<EtsyShop | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [filters, setFilters] = useState<FilterState>({ age: 365, favorites: 100, views: 1000 });
 
   const analyzeShop = async () => {
     if (!shopName.trim()) {
-      showToast("Please enter a shop name to begin the analysis.", "info");
+      toast({
+        title: "Shop name is missing",
+        description: "Please enter a shop name to begin the analysis.",
+        variant: 'destructive',
+      });
       return;
     }
 
@@ -40,7 +45,11 @@ export function ShopAnalyzer() {
         throw new Error(error.error || 'Could not retrieve shop data.');
       }
     } catch (error) {
-      showToast(error instanceof Error ? error.message : 'An unexpected error occurred.', "error");
+      toast({
+        title: "Error Analyzing Shop",
+        description: error instanceof Error ? error.message : 'An unexpected error occurred.',
+        variant: 'destructive',
+      });
     } finally {
       setIsLoading(false);
     }
@@ -105,7 +114,7 @@ export function ShopAnalyzer() {
             exit={{ opacity: 0, y: -50, scale: 0.9, rotateX: 30 }}
             transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
           >
-            <ShopDetails shop={shop} />
+            <ShopDetails shop={shop} filters={filters} />
           </motion.div>
         )}
       </AnimatePresence>
