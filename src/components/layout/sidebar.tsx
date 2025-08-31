@@ -3,12 +3,22 @@
 import React from 'react';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
-import { Button } from '@/components/ui/button';
-import { Home, Search, ShoppingCart, Tag, Users, List } from 'lucide-react';
+import { cn } from "@/lib/utils";
+import { buttonVariants } from '@/components/ui/button';
+import { Home, Search, ShoppingCart, Tag, Users, List, Store } from 'lucide-react';
+
+const navItems = [
+  { href: "/", icon: Home, label: "Dashboard" },
+  { href: "/keyword-research", icon: Search, label: "Keyword Research" },
+  { href: "/shop-analyzer", icon: Store, label: "Shop Analyzer" },
+  { href: "/listing-analyzer", icon: List, label: "Listing Analyzer" },
+  { href: "/tag-suggestions", icon: Tag, label: "Tag Suggestions" },
+  { href: "/competitor-tracker", icon: Users, label: "Competitor Tracker" },
+  { href: "/bulk-shop-analysis", icon: List, label: "Bulk Shop Analysis" },
+];
 
 export function Sidebar() {
     const pathname = usePathname();
-    console.log('Current pathname:', pathname);
 
   return (
     <div className="hidden border-r bg-muted/40 md:block">
@@ -21,70 +31,19 @@ export function Sidebar() {
         </div>
         <div className="flex-1">
           <nav className="grid items-start px-2 text-sm font-medium lg:px-4">
-            <Link href="/" className="w-full block">
-              <Button
-                variant={pathname === '/' ? 'secondary' : 'ghost'}
-                className="w-full justify-start"
-                onClick={() => console.log('Dashboard button clicked')}
+            {navItems.map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={cn(
+                  buttonVariants({ variant: pathname === item.href ? "secondary" : "ghost" }),
+                  "w-full justify-start"
+                )}
               >
-                <Home className="h-4 w-4 mr-2" />
-                Dashboard
-              </Button>
-            </Link>
-            <Link href="/keyword-research">
-              <Button
-                variant={pathname === '/keyword-research' ? 'secondary' : 'ghost'}
-                className="w-full justify-start"
-              >
-                <Search className="h-4 w-4" />
-                Keyword Research
-              </Button>
-            </Link>
-            <Link href="/shop-analyzer">
-              <Button
-                variant={pathname === '/shop-analyzer' ? 'secondary' : 'ghost'}
-                className="w-full justify-start"
-              >
-                <ShoppingCart className="h-4 w-4" />
-                Shop Analyzer
-              </Button>
-            </Link>
-            <Link href="/listing-analyzer">
-              <Button
-                variant={pathname === '/listing-analyzer' ? 'secondary' : 'ghost'}
-                className="w-full justify-start"
-              >
-                <List className="h-4 w-4" />
-                Listing Analyzer
-              </Button>
-            </Link>
-            <Link href="/tag-suggestions">
-              <Button
-                variant={pathname === '/tag-suggestions' ? 'secondary' : 'ghost'}
-                className="w-full justify-start"
-              >
-                <Tag className="h-4 w-4" />
-                Tag Suggestions
-              </Button>
-            </Link>
-            <Link href="/competitor-tracker">
-              <Button
-                variant={pathname === '/competitor-tracker' ? 'secondary' : 'ghost'}
-                className="w-full justify-start"
-              >
-                <Users className="h-4 w-4" />
-                Competitor Tracker
-              </Button>
-            </Link>
-            <Link href="/bulk-shop-analysis">
-              <Button
-                variant={pathname === '/bulk-shop-analysis' ? 'secondary' : 'ghost'}
-                className="w-full justify-start"
-              >
-                <List className="h-4 w-4" />
-                Bulk Shop Analysis
-              </Button>
-            </Link>
+                <item.icon className="h-4 w-4 mr-2" />
+                {item.label}
+              </Link>
+            ))}
           </nav>
         </div>
       </div>
