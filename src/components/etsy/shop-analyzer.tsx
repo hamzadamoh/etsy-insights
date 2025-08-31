@@ -42,7 +42,7 @@ export function ShopAnalyzer() {
       if (response.ok) {
         const data = await response.json();
         setShop(data.shop);
-        setListings(data.listings);
+        setListings(Array.isArray(data.listings) ? data.listings : []);
       } else {
         const error = await response.json();
         throw new Error(error.error || 'Could not retrieve shop data.');
@@ -95,7 +95,7 @@ export function ShopAnalyzer() {
             >
               {isLoading ? (
                 <>
-                  <Loader2 className_="h-5 w-5 animate-spin" />
+                  <Loader2 className="h-5 w-5 animate-spin" />
                   <span>Analyzing...</span>
                 </>
               ) : (
