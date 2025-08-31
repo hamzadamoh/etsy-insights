@@ -1,13 +1,13 @@
-
 'use client';
 
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Loader2, Store } from 'lucide-react';
+import { Loader2, Store, Search } from 'lucide-react';
 import { useToast } from '@/components/ui/toast';
 import { ShopDetails } from './shop-details';
+import { motion, AnimatePresence } from 'framer-motion';
 import type { EtsyShop } from '@/lib/types';
 
 export function ShopAnalyzer() {
@@ -18,7 +18,7 @@ export function ShopAnalyzer() {
 
   const analyzeShop = async () => {
     if (!shopName.trim()) {
-      showToast("Please enter a shop name", "error");
+      showToast("Please enter a shop name to begin the analysis.", "info");
       return;
     }
 
@@ -35,54 +35,80 @@ export function ShopAnalyzer() {
       if (response.ok) {
         const data = await response.json();
         setShop(data.shop);
-        showToast(`Successfully analyzed ${data.shop.shop_name}`, "success");
       } else {
         const error = await response.json();
-        throw new Error(error.error || 'Failed to fetch shop data');
+        throw new Error(error.error || 'Could not retrieve shop data.');
       }
     } catch (error) {
-      showToast(error instanceof Error ? error.message : 'Failed to analyze shop', "error");
+      showToast(error instanceof Error ? error.message : 'An unexpected error occurred.', "error");
     } finally {
       setIsLoading(false);
     }
   };
 
+  const inputVariants = {
+    initial: { scale: 1, boxShadow: '0px 0px 0px rgba(0,0,0,0)' },
+    loading: { scale: 1.02, boxShadow: '0px 0px 8px rgba(255,255,255,0.5)' },
+  };
+
   return (
-    <div className="space-y-6">
-      <Card>
+    <motion.div layout className="space-y-6">
+      <Card className="overflow-hidden">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Store className="h-5 w-5" />
-            Shop Analyzer
+          <CardTitle className="flex items-center gap-2 text-primary">
+            <Store className="h-6 w-6" />
+            <span className="font-bold">Etsy Shop Analyzer</span>
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="flex gap-2">
+        <CardContent>
+          <motion.div 
+            className="flex gap-2 relative"
+            variants={inputVariants}
+            animate={isLoading ? 'loading' : 'initial'}
+            transition={{ duration: 0.5, repeat: Infinity, repeatType: 'reverse' }}
+          >
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
             <Input
               value={shopName}
               onChange={(e) => setShopName(e.target.value)}
-              placeholder="Enter Etsy shop name"
+              placeholder="Enter an Etsy shop name to travel to its dimension..."
               onKeyPress={(e) => e.key === 'Enter' && analyzeShop()}
+              className="pl-10 text-base py-6 bg-transparent border-2 border-primary/20 focus:border-primary/60 focus:ring-0 transition-all duration-300"
             />
             <Button 
               onClick={analyzeShop} 
               disabled={isLoading}
-              className="flex items-center gap-2"
+              size="lg"
+              className="flex items-center gap-2 group"
             >
               {isLoading ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
+                <>
+                  <Loader2 className="h-5 w-5 animate-spin" />
+                  <span>Analyzing...</span>
+                </>
               ) : (
-                <Store className="h-4 w-4" />
+                <>
+                  <Store className="h-5 w-5 group-hover:translate-x-1 transition-transform"/>
+                  <span>Analyze</span>
+                </>
               )}
-              {isLoading ? 'Analyzing...' : 'Analyze'}
             </Button>
-          </div>
+          </motion.div>
         </CardContent>
       </Card>
 
-      {shop && (
-        <ShopDetails shop={shop} />
-      )}
-    </div>
+      <AnimatePresence>
+        {shop && (
+          <motion.div
+            initial={{ opacity: 0, y: 50, scale: 0.9, rotateX: -30 }}
+            animate={{ opacity: 1, y: 0, scale: 1, rotateX: 0 }}
+            exit={{ opacity: 0, y: -50, scale: 0.9, rotateX: 30 }}
+            transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+          >
+            <ShopDetails shop={shop} />
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.div>
   );
 }

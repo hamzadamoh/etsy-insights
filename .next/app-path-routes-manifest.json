@@ -2,15 +2,15 @@
   "/_not-found/page": "/_not-found",
   "/api/etsy/keyword-research/route": "/api/etsy/keyword-research",
   "/api/etsy/listing/route": "/api/etsy/listing",
-  "/api/etsy/shop/route": "/api/etsy/shop",
   "/api/etsy/tags/route": "/api/etsy/tags",
+  "/api/etsy/shop/route": "/api/etsy/shop",
   "/favicon.ico/route": "/favicon.ico",
   "/auth/page": "/auth",
-  "/bulk-shop-analysis/page": "/bulk-shop-analysis",
   "/competitor-tracker/page": "/competitor-tracker",
   "/keyword-research/page": "/keyword-research",
   "/listing-analyzer/page": "/listing-analyzer",
   "/page": "/",
+  "/bulk-shop-analysis/page": "/bulk-shop-analysis",
   "/shop-analyzer/page": "/shop-analyzer",
   "/tag-suggestions/page": "/tag-suggestions"
 }

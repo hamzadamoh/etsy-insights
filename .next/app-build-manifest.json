@@ -33,19 +33,19 @@
       "static/chunks/main-app-23eeda2f082783e6.js",
       "static/chunks/app/api/etsy/listing/route-9542d16891b51756.js"
     ],
-    "/api/etsy/shop/route": [
-      "static/chunks/webpack-693c99c7890a789b.js",
-      "static/chunks/4bd1b696-965df664d340569c.js",
-      "static/chunks/684-4157f01215e5a76a.js",
-      "static/chunks/main-app-23eeda2f082783e6.js",
-      "static/chunks/app/api/etsy/shop/route-6b52b142007f6358.js"
-    ],
     "/api/etsy/tags/route": [
       "static/chunks/webpack-693c99c7890a789b.js",
       "static/chunks/4bd1b696-965df664d340569c.js",
       "static/chunks/684-4157f01215e5a76a.js",
       "static/chunks/main-app-23eeda2f082783e6.js",
       "static/chunks/app/api/etsy/tags/route-ca1d02ec9cdd8a2d.js"
+    ],
+    "/api/etsy/shop/route": [
+      "static/chunks/webpack-693c99c7890a789b.js",
+      "static/chunks/4bd1b696-965df664d340569c.js",
+      "static/chunks/684-4157f01215e5a76a.js",
+      "static/chunks/main-app-23eeda2f082783e6.js",
+      "static/chunks/app/api/etsy/shop/route-6b52b142007f6358.js"
     ],
     "/auth/page": [
       "static/chunks/webpack-693c99c7890a789b.js",
@@ -59,14 +59,6 @@
       "static/chunks/330-f6070480ebd40ff0.js",
       "static/chunks/478-a126a32eb9a82177.js",
       "static/chunks/app/auth/page-1d248b3b892c30df.js"
-    ],
-    "/bulk-shop-analysis/page": [
-      "static/chunks/webpack-693c99c7890a789b.js",
-      "static/chunks/4bd1b696-965df664d340569c.js",
-      "static/chunks/684-4157f01215e5a76a.js",
-      "static/chunks/main-app-23eeda2f082783e6.js",
-      "static/chunks/352-9e82cb96c45b8d18.js",
-      "static/chunks/app/bulk-shop-analysis/page-1b9ac74c7995837d.js"
     ],
     "/competitor-tracker/page": [
       "static/chunks/webpack-693c99c7890a789b.js",
@@ -106,6 +98,14 @@
       "static/chunks/415-748d53598d52d763.js",
       "static/chunks/478-a126a32eb9a82177.js",
       "static/chunks/app/page-1969757be6a1882c.js"
+    ],
+    "/bulk-shop-analysis/page": [
+      "static/chunks/webpack-693c99c7890a789b.js",
+      "static/chunks/4bd1b696-965df664d340569c.js",
+      "static/chunks/684-4157f01215e5a76a.js",
+      "static/chunks/main-app-23eeda2f082783e6.js",
+      "static/chunks/352-9e82cb96c45b8d18.js",
+      "static/chunks/app/bulk-shop-analysis/page-1b9ac74c7995837d.js"
     ],
     "/shop-analyzer/page": [
       "static/chunks/webpack-693c99c7890a789b.js",
